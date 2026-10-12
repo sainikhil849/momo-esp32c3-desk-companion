@@ -1,0 +1,629 @@
+MOMO 2.2 - TEST REPORT (12 Oct 2026)
+====================================
+
+Summary: 513 automatic checks passed, 0 failed (154 of them new for 2.2).
+The real firmware compiles with no warnings from Momo's code in all 5
+builds, and ran on Espressif's ESP32-C3 emulator through every menu, game,
+reminder and alarm plus the new back button, head rub, charger, low battery,
+sleep and wake-up: no crash, no memory loss. All 15 printed parts pass the
+fit, overhang and collision checks.
+
+1. REAL COMPILER (the same one Arduino IDE uses)
+   Arduino-ESP32 core 3.3.12 and 3.1.1, board ESP32C3 Dev Module, Huge APP,
+   Flash Mode DIO. 0 warnings from Momo's code in all builds.
+     Robot      (3.3.12)  1,700,229 bytes flash (54%)  71,512 bytes RAM
+     Robot      (3.1.1)   1,638,994 bytes flash (52%)  69,780 bytes RAM
+     Simulator  (3.3.12)  1,423,395 bytes flash (45%)  52,528 bytes RAM
+     Simulator  (3.1.1)   1,376,526 bytes flash (43%)  51,188 bytes RAM
+     Simulator without Wi-Fi (backup, 3.3.12)  481,898 bytes (15%)
+
+2. ESP32-C3 EMULATOR (QEMU) - the real compiled firmware (test copy without
+   Wi-Fi, scripted touches and back-button presses)
+     Ran the full script: 1 start, 0 crashes, then the planned wake-up
+     restart after "sleep". Free memory flat the whole time: 280,772 bytes
+     (lowest 278,016).
+     Went through: petting (60 pets, emotion sounds), all 46 expressions,
+     Jump, Reaction, Flappy, Simon, Rock paper scissors, Rhythm, every Test
+     menu item, hero water and stretch, focus timer, sound off/on, an alarm,
+     water and stretch reminders, then the 2.2 part:
+       back button hold on the face   -> menu
+       back button double-tap         -> "Back" (menu closed)
+       hand kept on the head 5 s      -> "Rub! Momo closes its eyes and purrs"
+       charger plugged / unplugged    -> "Charging started" / "Charger unplugged"
+       battery dropping to 14 %       -> "Battery low" alert
+       back button held 3 s           -> "Going to sleep (back button)",
+                                         "I'll wake up for the alarm in 2 minutes"
+       back button pressed            -> Momo starts again (wake-up)
+     The packaged backup simulator firmware (no Wi-Fi, no battery knob) was
+     also started in the emulator: boots to "setup finished" and keeps running.
+   Emulator limits (not Momo problems, all handled in the test copy):
+     - it has no ADC: reading GPIO 4 would wait forever, so the test copy gets
+       the battery voltage from the script (Wokwi and the real chip have an ADC);
+     - it has no pull-up resistors: GPIO 5 reads "pressed", so the test copy
+       gets the button from the script. (This showed a real improvement, now
+       in the firmware: a button that is already down when Momo starts is
+       ignored until it is let go, so a stuck or shorted button can never make
+       Momo sleep again and again - 5 new checks below.)
+     - in real-time mode with extra debug printing, two earlier runs hit an
+       interrupt watchdog inside the emulator's own interrupt handling. The
+       same firmware ran clean in instruction-counted mode (-icount) and in
+       real-time mode without the extra printing, so it is counted as an
+       emulator timing artefact. Watch the Serial Monitor on the real robot.
+
+3. DESKTOP TEST RIG - Momo's own code with simulated parts (screen, clock
+   module, motion sensor, touch, back button, battery + charger, deep sleep,
+   buzzer, Wi-Fi, internet, Chronos app, ESP-NOW). Every screen was captured
+   (see 4_Pictures).
+     2.2: gestures, rub, back, battery, hero, weather :  68 checks passed
+     2.2: upgrade from 2.1, wake, no/empty battery    :  13 checks passed
+     2.2: back button held at start                   :   5 checks passed
+     2.2: simulator build (knob, switch, sleep)       :  11 checks passed
+     Simulator build (2.0/2.1)                        : 112 checks passed
+     Robot build (2.0/2.1)                            :  83 checks passed
+     Robot power-off / power-on (flash)               :  14 checks passed
+     2.1 upgrade                                      :  64 checks passed
+
+4. MOMO APP IN A REAL BROWSER (headless Chrome, phone size) talking to Momo's
+   real web-server code
+     Simulator build : 71 checks passed
+     Robot build     : 72 checks passed
+   New for 2.2: battery on Home (none / 70 % / charging / full / low + red),
+   Back button, 'Talk to Momo' help card, Momo's look (Mini hero / Classic,
+   hero sounds, rub, low-battery warning - saved and read back, Sounds page
+   in sync), weather every 1 hour from the internet saved, Phone source
+   explained, Update now fetches at once and shows "just now".
+
+5. 3D-PRINTED BODIES (5_Enclosures/source/checks_report.txt)
+     15 / 15 parts closed solids that fit the A1 mini, 9 / 9 plates OK,
+     overhangs only small ledges (2.4 mm or less), no supports needed,
+     0 mm3 collisions with everything assembled - for Hero Momo including the
+     LiPo, the TP4056 board and its USB-C, the slide switch and the button.
+
+NOT TESTED HERE (needs your hardware, accounts or licence)
+   - Bluetooth with the real Chronos app (its messages were simulated exactly
+     as the ChronosESP32 library delivers them).
+   - A real Wi-Fi radio and router, the real buzzer sound, the real OLED.
+   - A real LiPo, TP4056 board and its charge current, the real button and
+     slide switch, real deep-sleep current.
+   - The Wokwi extension itself (it needs your Wokwi licence on your PC).
+     Its potentiometer (battery knob) and pull-ups are Wokwi features that
+     could not be run here; if your simulator ever stops at "[Momo] reading
+     the battery", use the momo_wokwi_no_wifi folder (no battery knob).
+   - Printing the parts (the checks catch design mistakes; do the quick fit
+     check in 5_Enclosures/README.md first).
+
+ALL CHECKS
+
+--- 2.2: gestures, rub, back, battery, hero, weather (robot build) (68) ---
+  ok  hero look is on
+  ok  battery read at start: 70% (70)
+  ok  app: hero sounds chosen, quiet hours off for the test
+  ok  hero mask drawn around the eyes (83 px)
+  ok  status bar shows the battery
+  ok  classic look: no mask
+  ok  tap on the head pets Momo at once
+  ok  hold the head ~1 s and let go: menu opens
+  ok  double-tap in the menu: back to the face
+  ok  menu > Games (taps still move to the next item)
+  ok  double-tap in Games: back to the main menu
+  ok  double-tap again: back to the face
+  ok  keep a hand on the head: rub (no menu)
+  ok  rub: happy closed eyes
+  ok  rub: Momo purrs (8 purrs)
+  ok  after a long rub: heart eyes, more affection (56 -> 58)
+  ok  double-tap on a game's start screen: back to the games list
+  ok  two more double-taps: menu, then the face
+  ok  single tap starts the game
+  ok  while playing, hold = back to the games list
+  ok  and back to the face
+  ok  gallery open
+  ok  tap: next expression
+  ok  double-tap leaves the gallery
+  ok  internet weather arrived
+  ok  weather screen is animated (frames change)
+  ok  double-tap closes the weather
+  ok  all 8 weather kinds are animated
+  ok  back button tap = pet (when the touch sensor is not used)
+  ok  back button hold: menu
+  ok  back button tap: next item
+  ok  back button hold: choose (Music)
+  ok  back button double-tap: back
+  ok  USB-C charger plugged in: charging screen
+  ok  charging sound
+  ok  app sees the battery charging
+  ok  charging screen closes by itself
+  ok  battery full detected (4182 mV)
+  ok  charger unplugged
+  ok  low battery warning once (8%)
+  ok  warned only once, still awake
+  ok  hero Love sound
+  ok  46 hero emotion sounds, all different (46)
+  ok  every hero sound is new (none copied from the classic set)
+  ok  water reminder: hero sound
+  ok  hero water: flies in, lands, drinks, powers up (10 different frames)
+  ok  back to the face after drinking
+  ok  stretch reminder: hero sound
+  ok  hero training: power pose, reach, bends, punches, squat, jump (11 different frames)
+  ok  stretch done
+  ok  app: back to the classic look and cute sounds
+  ok  classic water animation and sound
+  ok  hold snoozes the water reminder
+  ok  back to the hero look
+  ok  app reads look, rub, weather refresh and source
+  ok  bad values are limited (refresh 10..180 min)
+  ok  backup includes the 2.2 settings
+  ok  app sees weather age and battery
+  ok  app 'Update now' fetches the weather at once
+  ok  no fetch before 10 minutes
+  ok  weather refreshes every 10 minutes (set in the app)
+  ok  source 'phone only': no internet weather
+  ok  rub off: holding the head opens the menu right away
+  ok  back to the face
+  ok  alarm set for 10:42
+  ok  back button held 3 s: Momo says good night and sleeps (screen off)
+  ok  the back button wakes Momo up
+  ok  Momo wakes up in time for the 10:42 alarm (16 min)
+
+--- 2.2: upgrade from 2.1, wake by button, no battery, empty battery (13) ---
+  ok  first start after the upgrade from 2.1
+  ok  upgrade: hero look and sounds, weather every 30 min, rub on
+  ok  upgrade keeps name and alarms
+  ok  upgrade keeps your reminders and best scores
+  ok  upgrade keeps the paired phone
+  ok  woke up from sleep by the back button
+  ok  no battery wired: Momo runs on USB as before
+  ok  no battery: no battery icon (34 vs 70 px)
+  ok  app: no battery
+  ok  2.2 settings saved next to the old ones
+  ok  empty battery noticed
+  ok  empty battery: Momo sleeps before the battery protection cuts power
+  ok  battery sleep: only the button wakes it (no alarm wake-ups)
+
+--- 2.2: back button held at start (5) ---
+  ok  button down at start: Momo says it works after you let go
+  ok  held 6 s from the start: Momo does NOT go to sleep
+  ok  after letting go: still awake, on the face
+  ok  after letting go the button works again: tap = pet
+  ok  a new 3 s hold after that = sleep, as normal
+
+--- 2.2: simulator build (knob, charger switch, back button, sleep) (11) ---
+  ok  knob all the way left: no battery
+  ok  battery knob read as about 70% (69%)
+  ok  charger switch on: charging screen
+  ok  back button (Wokwi push button): hold = menu
+  ok  back button double-tap = back
+  ok  touch (blue button) hold = menu
+  ok  touch double-tap = back
+  ok  simulator: back button held 3 s = sleep
+  ok  simulator: screen off while asleep
+  ok  simulator: pressing the back button wakes Momo (starts again) at 29010 ms
+  ok  simulator does not use the chip's deep sleep
+
+--- Momo app 2.2 + everything before (simulator build) (71) ---
+  ok  app opens on the pairing page
+  ok  phone name suggested (Android phone)
+  ok  'Show code' puts the code on Momo's screen
+  ok  6-digit code
+  ok  wrong code: 'Wrong code. 4 tries left.'
+  ok  paired: home page with Momo's time
+  ok  token kept on this phone only (localStorage)
+  ok  Momo has 1 paired phone
+  ok  Pet button pets Momo
+  ok  expression button 'Love' shows on Momo
+  ok  46 expression buttons (46)
+  ok  game button starts Jump on Momo
+  ok  music Next button
+  ok  song title shown in the app
+  ok  'I drank water' button counts a glass
+  ok  water count shown on home
+  ok  'Talk to Momo' card explains tap, hold, double-tap = back, rub, 3 s sleep, slide switch
+  ok  app Back button: Momo goes back to its face
+  ok  hold Momo's head 1 s and let go: menu opens
+  ok  app Back button closes the menu
+  ok  toast: Momo went back
+  ok  no battery wired: app says 'no battery (on USB power)'
+  ok  battery 3.95 V: app shows 70%
+  ok  USB-C plugged in: Momo shows the charging screen
+  ok  app shows 'charging'
+  ok  battery full: app says 'full - you can unplug'
+  ok  battery low: Momo shows the 'Battery low' alert
+  ok  app shows 'please charge (USB-C)' in red
+  ok  low battery bar turns red
+  ok  tap closes the battery alert
+  ok  alarm 07:45 'Gym' (rising sound) saved on Momo
+  ok  toast: Saved on Momo
+  ok  Test button rings the alarm on Momo
+  ok  alarm stopped on Momo (hold)
+  ok  My reminders card shown, empty
+  ok  repeat 'Some days' shows the day buttons
+  ok  reminders saved on Momo: 'Book ticket' 16:30 today, 'Call Amma' Mon-Sat
+  ok  'Test on Momo' shows the reminder on Momo
+  ok  tap on Momo closes it
+  ok  home shows the next reminder
+  ok  8 games in the app
+  ok  water: 15:30 added, every 20 min, goal 6 saved
+  ok  removing a reminder time works
+  ok  sound theme Robot, volume High, own tune saved
+  ok  'Play on Momo' plays the tune
+  ok  sound tester plays on Momo
+  ok  Momo's name saved
+  ok  look card: Mini hero is on (new 2.2 default)
+  ok  look card shows the same sound theme as the Sounds page (Robot)
+  ok  head rub and low-battery warning are on
+  ok  saved: Classic look, Hero sounds, rub off, battery warning off
+  ok  Sounds page shows Hero too
+  ok  saved: Mini hero look, rub on, battery warning on
+  ok  weather: every 30 minutes, Auto (defaults)
+  ok  Auto explained
+  ok  Phone source explained (+ simulator note)
+  ok  Update now with Phone source: tells you to open the Chronos app
+  ok  Internet source explained
+  ok  weather city and time zone saved
+  ok  weather every 1 hour, from the internet: saved on Momo
+  ok  Wi-Fi scan lists networks
+  ok  paired phones listed ('this phone')
+  ok  Wi-Fi password box is never filled in
+  ok  Update now: Momo gets the weather from the internet at once
+  ok  app shows 'Last update: just now from the internet'
+  ok  backup file downloaded
+  ok  backup has no password or token
+  ok  restore from a backup file
+  ok  reopening the app stays paired
+  ok  Unpair all: back to pairing, Momo forgets phones
+  ok  no errors in the browser console
+
+--- Momo app 2.2 + everything before (robot build) (72) ---
+  ok  app opens on the pairing page
+  ok  phone name suggested (Android phone)
+  ok  'Show code' puts the code on Momo's screen
+  ok  6-digit code
+  ok  wrong code: 'Wrong code. 4 tries left.'
+  ok  paired: home page with Momo's time
+  ok  token kept on this phone only (localStorage)
+  ok  Momo has 1 paired phone
+  ok  Pet button pets Momo
+  ok  expression button 'Love' shows on Momo
+  ok  46 expression buttons (46)
+  ok  game button starts Jump on Momo
+  ok  'I drank water' button counts a glass
+  ok  water count shown on home
+  ok  'Talk to Momo' card explains tap, hold, double-tap = back, rub, 3 s sleep, slide switch
+  ok  app Back button: Momo goes back to its face
+  ok  hold Momo's head 1 s and let go: menu opens
+  ok  app Back button closes the menu
+  ok  toast: Momo went back
+  ok  no battery wired: app says 'no battery (on USB power)'
+  ok  battery 3.95 V: app shows 70%
+  ok  USB-C plugged in: Momo shows the charging screen
+  ok  app shows 'charging'
+  ok  battery full: app says 'full - you can unplug'
+  ok  battery low: Momo shows the 'Battery low' alert
+  ok  app shows 'please charge (USB-C)' in red
+  ok  low battery bar turns red
+  ok  tap closes the battery alert
+  ok  alarm 07:45 'Gym' (rising sound) saved on Momo
+  ok  toast: Saved on Momo
+  ok  Test button rings the alarm on Momo
+  ok  alarm stopped on Momo (hold)
+  ok  My reminders card shown, empty
+  ok  repeat 'Some days' shows the day buttons
+  ok  reminders saved on Momo: 'Book ticket' 16:30 today, 'Call Amma' Mon-Sat
+  ok  'Test on Momo' shows the reminder on Momo
+  ok  tap on Momo closes it
+  ok  home shows the next reminder
+  ok  8 games in the app
+  ok  water: 15:30 added, every 20 min, goal 6 saved
+  ok  removing a reminder time works
+  ok  sound theme Robot, volume High, own tune saved
+  ok  'Play on Momo' plays the tune
+  ok  sound tester plays on Momo
+  ok  Momo's name saved
+  ok  look card: Mini hero is on (new 2.2 default)
+  ok  look card shows the same sound theme as the Sounds page (Robot)
+  ok  head rub and low-battery warning are on
+  ok  saved: Classic look, Hero sounds, rub off, battery warning off
+  ok  Sounds page shows Hero too
+  ok  saved: Mini hero look, rub on, battery warning on
+  ok  weather: every 30 minutes, Auto (defaults)
+  ok  Auto explained
+  ok  Phone source explained
+  ok  Update now with Phone source: tells you to open the Chronos app
+  ok  Internet source explained
+  ok  weather city and time zone saved
+  ok  weather every 1 hour, from the internet: saved on Momo
+  ok  Wi-Fi scan lists networks
+  ok  paired phones listed ('this phone')
+  ok  Wi-Fi password box is never filled in
+  ok  Wi-Fi chosen from the scan and saved
+  ok  password box cleared after saving
+  ok  app shows Momo's new address and next steps
+  ok  Update now: Momo gets the weather from the internet at once
+  ok  app shows 'Last update: just now from the internet'
+  ok  backup file downloaded
+  ok  backup has no password or token
+  ok  restore from a backup file
+  ok  reopening the app stays paired
+  ok  Unpair all: back to pairing, Momo forgets phones
+  ok  no errors in the browser console
+
+--- 2.1 upgrade (still passing) (64) ---
+  ok  paired
+  ok  classic look and cute sounds chosen in the app (2.1 checks)
+  ok  46 emotions, 46 different sounds
+  ok  app face button: Love plays the love sound
+  ok  pet: Momo shows Blush with its own sound
+  ok  gallery opens with the Neutral sound
+  ok  gallery: Happy has its own sound
+  ok  gallery: Joy has its own sound
+  ok  gallery: Laugh has its own sound
+  ok  gallery: Love has its own sound
+  ok  gallery: Blush has its own sound
+  ok  gallery: Wink has its own sound
+  ok  quiet idle faces stay silent (1 idle faces, no sound)
+  ok  Games menu has 8 games + Back
+  ok  Simon ready
+  ok  tap starts Simon
+  ok  Simon: bot repeated tap/tilt patterns up to round 7
+  ok  Simon: no answer = game over, best saved (7)
+  ok  app starts Copy me
+  ok  Copy me: tap, tilt left/right and shake all recognised (35 moves)
+  ok  Copy me: too slow = game over, best saved (35)
+  ok  app starts Rhythm
+  ok  Rhythm: exact taps earn 3 stars a round (9 stars, round 4)
+  ok  Rhythm: no taps = game over, best saved (9)
+  ok  app starts Rock paper scissors
+  ok  Rock paper scissors: every round judged right (5 rounds), over after Momo wins 3
+  ok  Rock paper scissors: your wins saved (1)
+  ok  app saves 'Book ticket' at 16:30 today (7 reminders kept, bad time skipped)
+  ok  a one-time reminder without a date is kept but off
+  ok  emoji removed for the screen
+  ok  reminders saved in flash
+  ok  app reads the reminders back
+  ok  home: next reminder '4:30 pm Book ticket'
+  ok  new best scores saved in flash
+  ok  app shows the new best scores
+  ok  games menu shows Simon's best
+  ok  app lists 8 games
+  ok  16:30: Momo shows 'Book ticket'
+  ok  rings in quiet hours; one-time reminder is done after ringing
+  ok  keeps ringing until you tap (12 beeps)
+  ok  tap = done
+  ok  Mon+Fri reminder stays quiet on Wednesday
+  ok  16:32: daily 'Call Amma' rings and stays on
+  ok  hold = later
+  ok  comes back after the snooze (30 s in the simulator)
+  ok  alarm and reminder at 16:40: the alarm first
+  ok  after the alarm, 'Water plants' shows
+  ok  a reminder shows even during a game ('Pay bill')
+  ok  app 'Test on Momo' button
+  ok  test of an empty slot refused
+  ok  next reminder: '10:45 pm Lock the door'
+  ok  backup contains your reminders
+  ok  at most 10 reminders
+  ok  10 long reminders still fit in the app data
+  ok  a backup with 10 reminders restores (2622 bytes)
+  ok  restore brings the earlier reminders back
+  ok  water: the bottle pours and the glass fills up (180 -> 494 pixels)
+  ok  water: Momo drinks through a straw, the glass empties
+  ok  water and stretch: every captured moment looks different (18 frames)
+  ok  22:44: Momo sleeps
+  ok  22:45: 'Lock the door' wakes the screen
+  ok  still showing and ringing after 40 s at night
+  ok  stops ringing after 3 minutes, stays on screen
+  ok  after 30 minutes unseen it goes back to the face
+
+--- Simulator build (2.0/2.1 checks, still passing) (112) ---
+  ok  screen, clock module and motion sensor found
+  ok  clock module time shown as local time (10:20)
+  ok  simulator joins Wokwi-GUEST
+  ok  Wi-Fi connected, app address known
+  ok  internet time received
+  ok  internet weather parsed (30C, 3 days)
+  ok  weather asked for the saved city
+  ok  app data is locked before pairing (401)
+  ok  settings are locked before pairing
+  ok  actions are locked before pairing
+  ok  info: 46 expressions and 8 games listed
+  ok  app page served (gzip)
+  ok  pair: 6-digit code shown on Momo's screen
+  ok  wrong code refused (4 tries left)
+  ok  right code gives a 64-character secret token
+  ok  Momo shows 'Paired!'
+  ok  only a fingerprint of the token is stored
+  ok  used code cannot be used again
+  ok  paired phone reads Momo's state
+  ok  a made-up token is refused
+  ok  app turns self-play off (for the scripted test)
+  ok  settings: 8 alarms, 5 water times, no password field
+  ok  Wi-Fi scan works
+  ok  app shows expression 22 on Momo
+  ok  expression number out of range refused
+  ok  unknown action refused
+  ok  3 pets: affection 50 -> 56
+  ok  pets make affection sounds
+  ok  3 quick pets: Momo laughs (giggle sound)
+  ok  5 quick pets: Momo celebrates
+  ok  every 10th pet: heart eyes (love sound)
+  ok  expression gallery opens at 1/46
+  ok  all 46 expressions drawn and every one looks different (46 unique)
+  ok  hold leaves the gallery
+  ok  Menu > Games > Jump: ready screen
+  ok  tap starts the game
+  ok  Jump: game over, best score saved (14)
+  ok  app starts Flappy
+  ok  Flappy started
+  ok  Flappy: flapping through gaps scores, best saved (18)
+  ok  app starts Catch
+  ok  Catch started (tilt Momo to move)
+  ok  Catch: tilting catches stars (20)
+  ok  Catch: game over, best saved (20)
+  ok  app starts Reaction
+  ok  Reaction: time saved (231 ms)
+  ok  hold = back to the games menu with best scores
+  ok  menu closes by itself
+  ok  best scores saved in flash
+  ok  app shows the best scores
+  ok  music screen shows the song title
+  ok  tilt right = next song
+  ok  tilt left = previous song
+  ok  tap = pause
+  ok  app setting: swap tilt direction
+  ok  with swap on, tilt right = previous
+  ok  app play/pause button works
+  ok  app saves alarm 1 (10:30 every day, Gym)
+  ok  alarms saved in flash right away
+  ok  next alarm shown in the app (10:30 am)
+  ok  alarm rings at 10:30 with its label
+  ok  tap = snooze
+  ok  snoozed alarm rings again (20 s in the simulator)
+  ok  hold = stop; repeating alarm stays on
+  ok  one-time alarm rings once and turns itself off
+  ok  alarm gets louder while it rings
+  ok  alarm stops by itself after 3 minutes
+  ok  app saves water times (sorted) + every 15 min
+  ok  water reminder at the exact time 10:40
+  ok  tap = I drank (1 today)
+  ok  Momo is proud after the drink
+  ok  every-15-minutes reminder at 10:45
+  ok  hold = remind me later
+  ok  snoozed reminder comes back (30 s in the simulator)
+  ok  second drink counted, tap again closes
+  ok  app starts a game
+  ok  stretch reminder waits while you play
+  ok  stretch reminder shows once Momo is free
+  ok  stretch done (1 today)
+  ok  app button: I drank water
+  ok  daily water goal reached: Momo celebrates
+  ok  quiet hours: sounds off, alarms still allowed
+  ok  pet in quiet hours: happy face, no sound
+  ok  app turns self-play on (10:00-20:00)
+  ok  no one around for 20 s: Momo gets bored
+  ok  bored in play hours: Momo plays Pong by itself
+  ok  Pong ends by itself
+  ok  outside play hours: no surprise games
+  ok  after 90 s alone Momo naps
+  ok  touch wakes Momo from the nap
+  ok  22:30: good night, screen dimmed
+  ok  Momo sleeps
+  ok  touch at night: sleepy peek, no sound
+  ok  7:00: good morning, screen bright
+  ok  new day: water and stretch counters reset
+  ok  before 7:00 Momo is asleep
+  ok  early alarm rings while Momo sleeps
+  ok  early alarm stopped: Momo stays awake
+  ok  still awake after the early alarm
+  ok  Menu > Clock
+  ok  Menu > Weather
+  ok  Menu > Focus timer starts
+  ok  focus face while the timer runs
+  ok  Menu > Stop focus timer
+  ok  Test: message
+  ok  Test: call
+  ok  Test: hug
+  ok  Menu > Phone & Wi-Fi > App address
+  ok  Send a hug: explained in the simulator
+  ok  space station overhead: alert
+  ok  secret token never printed
+  ok  Serial Monitor text is plain (no odd characters)
+
+--- Robot build (2.0/2.1 checks, still passing) (83) ---
+  ok  new clock module: Momo waits for the time
+  ok  first start opens hotspot Momo-AB12 with a random 8-digit password
+  ok  hotspot password is only on the screen, not printed
+  ok  hugs ready (ESP-NOW)
+  ok  setup screen shows the hotspot name and password
+  ok  phone joining the hotspot is sent to the Momo app
+  ok  Momo app page served from the hotspot
+  ok  app sees setup mode, no phone paired yet
+  ok  pair code shown
+  ok  5 wrong codes refused
+  ok  Momo shows 'Pairing locked'
+  ok  pairing locked for 5 minutes
+  ok  Chronos app connected
+  ok  phone sets the clock module (10:20)
+  ok  phone notification shown
+  ok  incoming call shown
+  ok  Momo rings for the call
+  ok  call ended: back to the face
+  ok  new song: music screen with title and artist
+  ok  tilt right sends NEXT to the phone
+  ok  song titles with emoji/symbols are cleaned for the screen
+  ok  tilt left sends PREVIOUS
+  ok  tap sends PLAY/PAUSE
+  ok  weather from the Chronos app (rain, 26C, Warangal)
+  ok  Menu > Weather
+  ok  Chronos water reminder: every 30 min, 9:00-18:00
+  ok  Chronos sedentary reminder: every 60 min
+  ok  Chronos quiet hours 13:00-14:00
+  ok  Chronos sleep time 23:00-6:30
+  ok  'Find my device' makes Momo call out
+  ok  Chronos alarm rings at 10:21
+  ok  hold stops it
+  ok  hug received from another Momo
+  ok  unknown radio messages are ignored
+  ok  Menu > Send a hug
+  ok  Wednesday-only Chronos alarm rings on Wednesday
+  ok  shake: Momo gets dizzy
+  ok  Monday-only Chronos alarm stays quiet on Wednesday
+  ok  after 5 minutes pairing works again
+  ok  app sends home Wi-Fi; Momo joins it
+  ok  Wi-Fi name printed, password never printed
+  ok  empty Wi-Fi name refused
+  ok  Momo shows its app address after joining
+  ok  internet time corrects the clock
+  ok  fresh phone weather is used (no internet weather call)
+  ok  space station overhead alert
+  ok  app shows the saved Wi-Fi name
+  ok  backup file downloads
+  ok  backup has no Wi-Fi details or tokens
+  ok  restore from backup (name and scores)
+  ok  reminder 'Book ticket' saved for tomorrow
+  ok  a file that is not a Momo backup is refused
+  ok  oversized upload refused
+  ok  bad values are limited or ignored
+  ok  broken settings refused
+  ok  empty alarm entries leave alarms unchanged
+  ok  app sets the weather city
+  ok  old phone weather: internet weather for the new city
+  ok  devices list shows this phone
+  ok  second phone paired
+  ok  second phone removes the first one
+  ok  removed phone is locked out
+  ok  one phone left
+  ok  max 3 phones: the oldest is replaced
+  ok  Tablet still paired
+  ok  app: bored after 1 min, games 5 min apart
+  ok  setup hotspot closes after Wi-Fi works
+  ok  not bored before 1 minute
+  ok  bored after 1 minute alone
+  ok  bored: plays Pong by itself
+  ok  Pong lasts 30 s
+  ok  no second game within 5 minutes
+  ok  next game after 5 minutes
+  ok  stretch reminder at 11:00
+  ok  hold = later
+  ok  not before 10 minutes
+  ok  stretch reminder returns after 10 minutes
+  ok  sleeps at 23:00 (time from the Chronos app)
+  ok  wakes at 6:30
+  ok  quiet hours from the Chronos app: no sounds
+  ok  call in quiet hours: shown, not rung
+  ok  Wi-Fi password never printed or sent to the app
+  ok  tokens never printed
+
+--- Robot after power-off (still passing) (14) ---
+  ok  settings and alarms survive power-off
+  ok  scores (old and new games) and pets survive power-off
+  ok  your reminders survive power-off
+  ok  Chronos and weather settings survive power-off
+  ok  time from the clock module right away
+  ok  joins the saved Wi-Fi, no setup hotspot
+  ok  password still never printed
+  ok  starts on the face (not the setup screen)
+  ok  paired phone works after power-off
+  ok  removed phone stays removed
+  ok  3 paired phones remembered
+  ok  info without a token reveals nothing private
+  ok  unpair all phones from the app
+  ok  after power-off the reminder still rings on time
+

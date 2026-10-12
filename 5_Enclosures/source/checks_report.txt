@@ -1,0 +1,86 @@
+== 1. solids + bed fit (A1 mini 180 mm cube) ==
+  A_cube_shell    OK     68.0 x   62.0 x   55.8 mm    38.2 cm3  ~  26 g
+  B_pod_shell     OK     70.4 x   64.3 x   55.8 mm    38.0 cm3  ~  26 g
+  A_cube_back     OK     68.0 x   62.0 x    9.4 mm    10.4 cm3  ~   7 g
+  B_pod_back      OK     50.0 x   42.0 x    9.4 mm     5.2 cm3  ~   4 g
+  A_cube_visor    OK     54.0 x   34.0 x    1.9 mm     1.1 cm3  ~   1 g
+  B_pod_visor     OK     50.0 x   32.0 x    1.9 mm     0.8 cm3  ~   1 g
+  oled_retainer   OK     50.6 x    8.0 x    2.9 mm     1.0 cm3  ~   1 g
+  A_cube_ear      OK     22.0 x   22.0 x    6.0 mm     1.8 cm3  ~   1 g
+  B_pod_antenna   OK      9.2 x    9.2 x   14.0 mm     0.5 cm3  ~   0 g
+  A_cube_dock     OK     78.0 x   68.2 x   10.0 mm    31.8 cm3  ~  22 g
+  tray            OK     43.0 x   40.0 x   14.6 mm     3.4 cm3  ~   2 g
+  C_hero_shell    OK     70.0 x   70.0 x   55.8 mm    49.1 cm3  ~  34 g
+  C_hero_back     OK     70.0 x   70.0 x    9.4 mm    12.0 cm3  ~   8 g
+  C_hero_mask     OK     61.8 x   32.7 x    1.9 mm     1.0 cm3  ~   1 g
+  C_hero_cape     OK     58.0 x   17.3 x   40.1 mm     3.7 cm3  ~   3 g
+== 2. overhangs > 45 deg in print orientation (bridges listed with their span) ==
+  A_cube_shell    steep groups=38 (widest  1.8 mm)  bridges= 1 (longest span  0.8 mm)
+      steep  area   10.5 mm2  span  0.6  len  16.3  at z= 37.6
+      steep  area   10.5 mm2  span  0.6  len  16.3  at z= 37.6
+      steep  area    4.8 mm2  span  1.4  len   3.1  at z= 54.0
+      steep  area    4.8 mm2  span  1.4  len   3.1  at z= 54.0
+      steep  area    3.5 mm2  span  0.8  len   4.0  at z= 17.6
+      steep  area    3.5 mm2  span  0.8  len   4.0  at z= 17.6
+  B_pod_shell     steep groups=10 (widest  2.1 mm)  bridges= 1 (longest span  0.4 mm)
+      steep  area    7.7 mm2  span  1.1  len  10.1  at z= 18.8
+      steep  area    6.0 mm2  span  0.9  len   7.8  at z=  8.6
+      steep  area    5.1 mm2  span  0.8  len   5.9  at z= 10.9
+      steep  area    5.1 mm2  span  0.8  len   5.9  at z= 10.9
+      steep  area    5.1 mm2  span  0.8  len   5.9  at z= 48.5
+      steep  area    5.1 mm2  span  0.8  len   5.8  at z= 48.5
+  A_cube_back     steep groups= 2 (widest  1.2 mm)  bridges= 4 (longest span  5.2 mm)
+      steep  area    8.6 mm2  span  1.2  len   6.8  at z=  6.5
+      steep  area    8.6 mm2  span  1.2  len   6.8  at z=  6.5
+      bridge area   19.4 mm2  span  5.1  len   5.7  at z=  0.6
+      bridge area   19.4 mm2  span  5.1  len   5.7  at z=  0.6
+      bridge area   15.7 mm2  span  5.2  len   5.3  at z=  0.6
+      bridge area   15.7 mm2  span  5.2  len   5.3  at z=  0.6
+  B_pod_back      steep groups= 2 (widest  1.2 mm)  bridges= 0 (longest span  0.0 mm)
+      steep  area    8.6 mm2  span  1.2  len   6.8  at z=  6.5
+      steep  area    8.6 mm2  span  1.2  len   6.8  at z=  6.5
+  A_cube_visor    steep groups= 0 (widest  0.0 mm)  bridges= 0 (longest span  0.0 mm)
+  B_pod_visor     steep groups= 0 (widest  0.0 mm)  bridges= 0 (longest span  0.0 mm)
+  oled_retainer   steep groups= 0 (widest  0.0 mm)  bridges= 0 (longest span  0.0 mm)
+  A_cube_ear      steep groups= 0 (widest  0.0 mm)  bridges= 2 (longest span  1.9 mm)
+      bridge area    2.8 mm2  span  1.9  len   1.9  at z=  3.0
+      bridge area    2.8 mm2  span  1.9  len   1.9  at z=  3.0
+  B_pod_antenna   steep groups= 0 (widest  0.0 mm)  bridges= 0 (longest span  0.0 mm)
+  A_cube_dock     steep groups= 0 (widest  0.0 mm)  bridges= 4 (longest span  8.4 mm)
+      bridge area   55.4 mm2  span  8.4  len   8.4  at z=  1.0
+      bridge area   55.4 mm2  span  8.4  len   8.4  at z=  1.0
+      bridge area   55.4 mm2  span  8.4  len   8.4  at z=  1.0
+      bridge area   55.4 mm2  span  8.4  len   8.4  at z=  1.0
+  tray            steep groups= 0 (widest  0.0 mm)  bridges= 4 (longest span  1.1 mm)
+      bridge area   18.1 mm2  span  0.8  len  22.6  at z= 12.4
+      bridge area   18.1 mm2  span  0.8  len  22.6  at z= 12.4
+      bridge area    4.2 mm2  span  1.1  len   4.0  at z=  2.6
+      bridge area    4.2 mm2  span  1.1  len   4.0  at z=  2.6
+  C_hero_shell    steep groups=14 (widest  2.4 mm)  bridges= 1 (longest span  0.8 mm)
+      steep  area   13.0 mm2  span  0.6  len  17.4  at z= 25.2
+      steep  area   13.0 mm2  span  0.6  len  17.4  at z= 25.2
+      steep  area    7.7 mm2  span  2.4  len   2.9  at z= 51.6
+      steep  area    7.7 mm2  span  2.4  len   2.9  at z= 51.6
+      steep  area    6.5 mm2  span  0.6  len   9.9  at z= 32.7
+      steep  area    6.5 mm2  span  0.6  len   9.9  at z= 32.7
+  C_hero_back     steep groups= 2 (widest  1.2 mm)  bridges=17 (longest span  2.4 mm)
+      steep  area    8.1 mm2  span  1.2  len   6.4  at z=  6.5
+      steep  area    8.1 mm2  span  1.2  len   6.4  at z=  6.5
+      bridge area    4.4 mm2  span  2.3  len   3.3  at z=  0.5
+      bridge area    3.4 mm2  span  2.2  len   2.3  at z=  0.5
+      bridge area    3.3 mm2  span  2.4  len   2.4  at z=  0.5
+      bridge area    3.3 mm2  span  2.4  len   2.4  at z=  0.5
+  C_hero_mask     steep groups= 0 (widest  0.0 mm)  bridges= 0 (longest span  0.0 mm)
+  C_hero_cape     steep groups= 6 (widest  2.3 mm)  bridges= 0 (longest span  0.0 mm)
+      steep  area   44.4 mm2  span  2.3  len  17.2  at z= 30.9
+      steep  area   19.0 mm2  span  2.3  len   5.9  at z= 19.7
+      steep  area   19.0 mm2  span  2.3  len   5.9  at z= 19.7
+      steep  area    6.3 mm2  span  0.7  len   8.7  at z= 15.0
+      steep  area    6.3 mm2  span  0.7  len   8.7  at z= 15.0
+      steep  area    3.4 mm2  span  0.7  len   4.3  at z=  6.8
+== 3. collisions when assembled (mm3; ~0 expected) ==
+  A: largest unintended overlap 0.00 mm3 (retainer clamps OLED by 0.1 mm, as designed)
+  A docked: largest unintended overlap 0.00 mm3 (retainer clamps OLED by 0.1 mm, as designed)
+  B: largest unintended overlap 0.04 mm3 (retainer clamps OLED by 0.1 mm, as designed)
+  C: largest unintended overlap 0.00 mm3 (retainer clamps OLED by 0.1 mm, as designed)
+ALL CHECKS PASSED

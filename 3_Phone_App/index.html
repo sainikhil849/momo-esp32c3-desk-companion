@@ -1,0 +1,596 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#101322">
+<link rel="manifest" href="/manifest.json">
+<link rel="icon" href="/icon.svg">
+<title>Momo</title>
+<style>
+:root{--bg:#101322;--card:#191d33;--card2:#22274a;--line:#2e3460;--text:#eef0ff;--dim:#9aa1d0;--acc:#7cf3e8;--acc2:#ffb3d1;--bad:#ff7a7a;--ok:#8dffb0}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--text);font:16px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+body{padding:0 0 84px}
+header{position:sticky;top:0;z-index:5;background:var(--bg);display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--line)}
+.eyes{display:flex;gap:6px}.eyes i{width:16px;height:20px;border-radius:6px;background:var(--acc);display:block;animation:blink 5s infinite}
+@keyframes blink{0%,92%,100%{transform:scaleY(1)}95%{transform:scaleY(.1)}}
+header h1{font-size:20px;margin:0;flex:1}
+header small{color:var(--dim)}
+main{padding:12px 16px;max-width:640px;margin:0 auto}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;margin:0 0 12px}
+.card h2{font-size:16px;margin:0 0 10px;display:flex;align-items:center;gap:8px}
+.row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:8px 0}
+.row>label{flex:1;min-width:140px;color:var(--dim)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:8px}
+.stat{background:var(--card2);border-radius:12px;padding:10px}
+.stat b{display:block;font-size:20px}.stat span{color:var(--dim);font-size:13px}
+button,.btn{background:var(--card2);color:var(--text);border:1px solid var(--line);border-radius:12px;padding:10px 14px;font:inherit;cursor:pointer;min-height:44px}
+button.main{background:var(--acc);color:#04221f;border:0;font-weight:600}
+button.warn{border-color:var(--bad);color:var(--bad)}
+button:active{transform:scale(.97)}
+button:disabled{opacity:.5}
+input,select{background:#0c0f1d;color:var(--text);border:1px solid var(--line);border-radius:10px;padding:9px 10px;font:inherit;min-height:42px;max-width:100%}
+input[type=checkbox]{width:24px;height:24px;min-height:0;accent-color:var(--acc)}
+input[type=range]{accent-color:var(--acc)}
+.days{display:flex;gap:4px;flex-wrap:wrap}
+.days button{min-width:38px;padding:8px 0;min-height:38px;border-radius:10px}
+.days button.on{background:var(--acc);color:#04221f;border-color:var(--acc)}
+.seg{display:flex;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.seg button{border:0;border-radius:0;flex:1 0 auto;min-width:0;padding-left:12px;padding-right:12px}
+.seg button.on{background:var(--acc);color:#04221f}
+.times{display:flex;flex-wrap:wrap;gap:6px}
+.chip{display:inline-flex;align-items:center;gap:4px;background:var(--card2);border:1px solid var(--line);border-radius:20px;padding:2px 4px 2px 10px}
+.chip button{min-height:30px;padding:2px 8px;border:0;background:none;color:var(--dim)}
+.faces{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:6px}
+.faces button{font-size:14px;padding:8px 6px}
+.bar{height:10px;background:#0c0f1d;border-radius:6px;overflow:hidden}.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--acc2),var(--acc))}
+.muted{color:var(--dim);font-size:14px}
+.toast{position:fixed;left:50%;bottom:96px;transform:translateX(-50%);background:#000c;color:#fff;padding:10px 16px;border-radius:12px;opacity:0;transition:.3s;pointer-events:none;z-index:20;max-width:90vw}
+.toast.show{opacity:1}
+nav{position:fixed;bottom:0;left:0;right:0;background:#0b0e1bee;border-top:1px solid var(--line);display:flex;padding:6px 6px calc(6px + env(safe-area-inset-bottom));z-index:6}
+nav button{flex:1;border:0;background:none;color:var(--dim);font-size:12px;padding:6px 0;display:flex;flex-direction:column;align-items:center;gap:2px;min-height:52px}
+nav button svg{width:24px;height:24px}
+nav button.on{color:var(--acc)}
+.page{display:none}.page.on{display:block}
+.alarm{border-top:1px solid var(--line);padding:10px 0}
+.alarm:first-of-type{border-top:0}
+.big{font-size:28px;font-weight:700}
+.center{text-align:center}
+.list{margin:6px 0;padding:0;list-style:none}
+.list li{display:flex;align-items:center;gap:8px;padding:8px 0;border-top:1px solid var(--line)}
+.list li:first-child{border-top:0}
+.list li span{flex:1}
+#pair .code{font-size:32px;letter-spacing:8px;text-align:center;width:100%;max-width:260px}
+.music{display:flex;gap:8px;align-items:center}
+.music .t{flex:1;min-width:0}.music .t b,.music .t span{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+details summary{cursor:pointer;color:var(--acc);margin:6px 0}
+a{color:var(--acc)}
+.batt{display:inline-flex;align-items:center;gap:8px}
+.batt i{position:relative;display:inline-block;width:30px;height:14px;border:2px solid var(--dim);border-radius:3px}
+.batt i::after{content:"";position:absolute;right:-5px;top:3px;width:3px;height:4px;background:var(--dim);border-radius:0 2px 2px 0}
+.batt i b{position:absolute;left:1px;top:1px;bottom:1px;background:var(--ok);border-radius:1px}
+.batt.low i b{background:var(--bad)}
+.help li b{flex:none;width:46%;font-weight:600}
+.help li span{color:var(--dim)}
+</style>
+</head>
+<body>
+<header><div class="eyes"><i></i><i></i></div><h1 id="title">Momo</h1><small id="conn"></small></header>
+<main>
+
+<section id="pair" class="page">
+  <div class="card center">
+    <h2 style="justify-content:center">Pair this phone with Momo</h2>
+    <p class="muted">For your safety, only someone who can see Momo's screen can pair a phone.</p>
+    <p><button class="main" id="pairStart">1. Show a code on Momo</button></p>
+    <p><input id="pairCode" class="code" inputmode="numeric" maxlength="6" placeholder="------" autocomplete="one-time-code"></p>
+    <p><input id="pairName" placeholder="Name of this phone" maxlength="20"></p>
+    <p><button class="main" id="pairGo">2. Pair</button></p>
+    <p class="muted" id="pairMsg"></p>
+  </div>
+</section>
+
+<section id="home" class="page">
+  <div class="card">
+    <h2>Now</h2>
+    <div class="grid">
+      <div class="stat"><b id="sTime">--:--</b><span id="sFace">-</span></div>
+      <div class="stat"><b id="sWater">0/8</b><span>glasses today</span></div>
+      <div class="stat"><b id="sStretch">0/4</b><span>stretches today</span></div>
+      <div class="stat"><b id="sPets">0</b><span>pets</span></div>
+    </div>
+    <div class="row"><label>Affection</label><div class="bar" style="flex:2"><i id="sAff" style="width:50%"></i></div></div>
+    <div class="row"><label>Next alarm</label><span id="sAlarm">none</span></div>
+    <div class="row"><label>Next reminder</label><span id="sNote">none</span></div>
+    <div class="row"><label>Battery</label><span class="batt" id="sBatt"><i><b style="width:0"></b></i><span>-</span></span></div>
+    <div class="row"><label>Weather</label><span id="sWeather">-</span></div>
+    <div class="row"><label>Phone (Chronos)</label><span id="sPhone">-</span></div>
+  </div>
+  <div class="card">
+    <h2>Music</h2>
+    <div class="music"><div class="t"><b id="mTitle">Nothing playing</b><span class="muted" id="mArtist">Play a song on your phone</span></div>
+      <button data-music="prev" aria-label="Previous">&#9664;&#9664;</button><button data-music="toggle" id="mPlay" aria-label="Play or pause">&#9654;</button><button data-music="next" aria-label="Next">&#9654;&#9654;</button></div>
+  </div>
+  <div class="card">
+    <h2>Quick</h2>
+    <div class="grid">
+      <button data-act="pet">Pet Momo</button><button data-act="water">I drank water</button>
+      <button data-act="stretch">Stretch now</button><button data-act="weather">Show weather</button>
+      <button data-act="find">Find Momo</button><button data-act="remindWater">Water reminder</button>
+      <button data-act="back" data-msg="Momo went back">Back</button><button data-act="weatherNow" data-msg="Momo is getting the weather">Update weather</button>
+    </div>
+  </div>
+  <div class="card">
+    <h2>Talk to Momo</h2>
+    <p class="muted">The head and the back button do the same things, so if one ever stops working, use the other.</p>
+    <ul class="list help" id="help">
+      <li><b>Tap</b><span>next, pet Momo, play</span></li>
+      <li><b>Hold 1 second, let go</b><span>choose (on Momo's face: open the menu)</span></li>
+      <li><b>Double-tap</b><span>back (in a game: hold to leave)</span></li>
+      <li><b>Keep your hand on the head</b><span>rub: Momo closes its eyes and purrs</span></li>
+      <li><b>Hold the back button 3 seconds</b><span>sleep. Press it again to wake Momo.</span></li>
+      <li><b>Slide switch</b><span>fully off (it still charges)</span></li>
+    </ul>
+  </div>
+  <div class="card">
+    <h2>Games</h2>
+    <div class="grid" id="games"></div>
+  </div>
+  <div class="card">
+    <h2>46 expressions</h2>
+    <p class="muted">Tap one and Momo shows it.</p>
+    <div class="faces" id="faces"></div>
+  </div>
+</section>
+
+<section id="alarms" class="page">
+  <div class="card"><h2>Alarms</h2><p class="muted">Tap the screen to snooze, hold to stop. Alarms ring even in quiet hours.</p><div id="alarmList"></div>
+    <button class="main" data-save="alarms">Save alarms</button></div>
+</section>
+
+<section id="reminders" class="page">
+  <div class="card"><h2>My reminders</h2>
+    <p class="muted">Anything you must not forget, like "Book ticket" at 4:30 PM. Momo shows your words and rings until you tap it (hold = again in 5 minutes). Rings even in quiet hours.</p>
+    <div id="noteList"></div>
+    <div class="row"><button type="button" id="noteAdd">Add a reminder</button></div>
+    <button class="main" data-save="notes">Save my reminders</button></div>
+  <div id="remWater"></div>
+  <div id="remStretch"></div>
+  <div class="card"><button class="main" data-save="reminders">Save reminders</button></div>
+</section>
+
+<section id="sounds" class="page">
+  <div class="card">
+    <h2>Sound</h2>
+    <div class="row"><label>Theme</label><select id="sndTheme"><option value="4">Hero</option><option value="0">Cute</option><option value="1">Robot</option><option value="2">Soft</option><option value="3">Retro</option></select></div>
+    <div class="row"><label>Volume</label><div class="seg" id="sndVol"><button data-v="0">Off</button><button data-v="1">Low</button><button data-v="2">Medium</button><button data-v="3">High</button></div></div>
+    <div class="row"><label>Emotion and affection sounds</label><input type="checkbox" id="sndPets"></div>
+    <div class="row"><label>Reminder sounds</label><input type="checkbox" id="sndRem"></div>
+    <div class="row"><label>Notification sounds</label><input type="checkbox" id="sndNot"></div>
+    <div class="row"><label>Game sounds</label><input type="checkbox" id="sndGames"></div>
+    <div class="row"><label>Hourly chime</label><input type="checkbox" id="sndChime"></div>
+  </div>
+  <div class="card">
+    <h2>Quiet hours</h2>
+    <p class="muted">No sounds (alarms still ring). Momo is also quiet while he sleeps at night.</p>
+    <div class="row"><label>Quiet hours on</label><input type="checkbox" id="qOn"></div>
+    <div class="row"><label>From</label><input type="time" id="qFrom"><label style="flex:none;min-width:0">to</label><input type="time" id="qTo"></div>
+  </div>
+  <div class="card">
+    <h2>Your own tune</h2>
+    <p class="muted">Notes like <b>C5/8 E5/8 G5/4</b>. Letter A-G (# for sharp), octave 1-8, /length (1, 2, 4, 8, 16). R = pause. Choose "My tune" for an alarm to wake up to it.</p>
+    <input id="tune" style="width:100%" maxlength="99">
+    <div class="row"><button id="tuneTry">Play on Momo</button></div>
+  </div>
+  <div class="card">
+    <h2>Try Momo's sounds</h2>
+    <div class="grid" id="sndTry"></div>
+  </div>
+  <div class="card"><button class="main" data-save="sounds">Save sound settings</button></div>
+</section>
+
+<section id="more" class="page">
+  <div class="card">
+    <h2>Momo's look</h2>
+    <div class="row"><label>Look</label><div class="seg" id="xLook"><button data-v="1">Mini hero</button><button data-v="0">Classic</button></div></div>
+    <div class="row"><label>Sounds</label><select id="xTheme"><option value="4">Hero</option><option value="0">Cute</option><option value="1">Robot</option><option value="2">Soft</option><option value="3">Retro</option></select></div>
+    <p class="muted">Mini hero: a little mask, a cape when Momo drinks water and stretches, and power-up sounds. Classic: Momo as it was before.</p>
+    <div class="row"><label>Head rub (keep your hand on Momo's head)</label><input type="checkbox" id="xRub"></div>
+    <div class="row"><label>Warn me when the battery is low</label><input type="checkbox" id="xLowBatt"></div>
+    <button class="main" data-save="look">Save</button>
+  </div>
+  <div class="card">
+    <h2>Momo's day</h2>
+    <div class="row"><label>Name</label><input id="bName" maxlength="15"></div>
+    <div class="row"><label>Wakes up at</label><input type="time" id="bWake"></div>
+    <div class="row"><label>Goes to sleep at</label><input type="time" id="bSleep"></div>
+    <div class="row"><label>24-hour clock</label><input type="checkbox" id="b24"></div>
+    <div class="row"><label>Personality</label><div class="seg" id="bLively"><button data-v="0">Calm</button><button data-v="1">Normal</button><button data-v="2">Lively</button></div></div>
+    <div class="row"><label>Gets bored after (min)</label><input type="number" id="bBored" min="1" max="60" style="width:90px"></div>
+    <div class="row"><label>Naps after (min)</label><input type="number" id="bNap" min="2" max="120" style="width:90px"></div>
+    <div class="row"><label>Plays games by himself when bored</label><input type="checkbox" id="bSelf"></div>
+    <div class="row"><label>Only between</label><input type="time" id="bPlayFrom"><label style="flex:none;min-width:0">and</label><input type="time" id="bPlayTo"></div>
+    <div class="row"><label>At most once every (min)</label><input type="number" id="bGap" min="5" max="240" style="width:90px"></div>
+    <div class="row"><label>Focus / break (min)</label><input type="number" id="bFocus" min="5" max="120" style="width:80px"><input type="number" id="bBreak" min="1" max="60" style="width:80px"></div>
+    <div class="row"><label>Swap music tilt (left/right)</label><input type="checkbox" id="bTilt"></div>
+    <div class="row"><label>Hugs with other Momos</label><input type="checkbox" id="bHugs"></div>
+    <div class="row"><label>Space-station alerts</label><input type="checkbox" id="bIss"></div>
+    <button class="main" data-save="behaviour">Save</button>
+  </div>
+  <div class="card">
+    <h2>Weather and time</h2>
+    <div class="row"><label>Internet weather</label><input type="checkbox" id="wOn"></div>
+    <div class="row"><input id="wSearch" placeholder="Search your city" style="flex:1"><button id="wFind">Find</button></div>
+    <ul class="list" id="wResults"></ul>
+    <div class="row"><label>City</label><input id="wCity" maxlength="23"></div>
+    <div class="row"><label>Latitude / longitude</label><input type="number" step="0.001" id="wLat" style="width:110px"><input type="number" step="0.001" id="wLon" style="width:110px"></div>
+    <div class="row"><label>Time zone (UTC +hours)</label><select id="tz"></select></div>
+    <div class="row"><label>Get the weather every</label><select id="wEvery"><option value="10">10 minutes</option><option value="15">15 minutes</option><option value="30">30 minutes</option><option value="60">1 hour</option><option value="120">2 hours</option><option value="180">3 hours</option></select></div>
+    <div class="row"><label>Weather from</label><div class="seg" id="wSource"><button data-v="0">Auto</button><button data-v="1">Phone</button><button data-v="2">Internet</button></div></div>
+    <p class="muted" id="wSourceHelp"></p>
+    <div class="row"><label>Last update</label><span id="wAge">-</span><button type="button" id="wNow">Update now</button></div>
+    <button class="main" data-save="weather">Save</button>
+  </div>
+  <div class="card">
+    <h2>Wi-Fi</h2>
+    <div class="row"><label>Momo is on</label><b id="wifiNow">-</b></div>
+    <div class="row"><button id="wifiScan">Find Wi-Fi networks</button></div>
+    <ul class="list" id="wifiList"></ul>
+    <div class="row"><label>Network name</label><input id="wifiSsid" maxlength="32" autocomplete="off"></div>
+    <div class="row"><label>Password</label><input id="wifiPass" type="password" maxlength="63" autocomplete="new-password"></div>
+    <p class="muted">Momo keeps the password to itself: it is never shown here or sent back to any phone.</p>
+    <button class="main" id="wifiSave">Connect Momo</button>
+    <p class="muted" id="wifiMsg" aria-live="polite"></p>
+  </div>
+  <div class="card">
+    <h2>Security and backup</h2>
+    <p class="muted">Phones that can control Momo:</p>
+    <ul class="list" id="devices"></ul>
+    <div class="row"><button id="backup">Download backup</button><label class="btn" for="restoreFile" style="display:inline-flex;align-items:center">Restore backup</label><input type="file" id="restoreFile" accept=".json,application/json" hidden></div>
+    <p class="muted">The backup has Momo's settings, alarms, reminders and best scores. It never contains your Wi-Fi password or pairing keys.</p>
+    <div class="row"><button id="resetScores" class="warn">Reset game scores</button><button id="unpairAll" class="warn">Unpair all phones</button></div>
+  </div>
+  <div class="card">
+    <h2>Add Momo to your home screen</h2>
+    <p class="muted">In Chrome, tap the menu (&#8942;) and choose <b>Add to Home screen</b>. Momo's app then opens like any other app.</p>
+    <p class="muted" id="ver"></p>
+  </div>
+</section>
+
+</main>
+<div class="toast" id="toast"></div>
+<nav id="nav">
+  <button data-page="home" class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="6" width="6" height="9" rx="2"/><rect x="14" y="6" width="6" height="9" rx="2"/></svg>Home</button>
+  <button data-page="alarms"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="13" r="7"/><path d="M12 9v4l3 2M5 4 2 7M19 4l3 3"/></svg>Alarms</button>
+  <button data-page="reminders"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 3h10l-1 18H8z"/><path d="M8 10h8"/></svg>Reminders</button>
+  <button data-page="sounds"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 10v4h4l5 4V6L8 10z"/><path d="M16 9a4 4 0 0 1 0 6M18.5 6.5a8 8 0 0 1 0 11"/></svg>Sounds</button>
+  <button data-page="more"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/></svg>More</button>
+</nav>
+<script>
+"use strict";
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const DAYS=["S","M","T","W","T","F","S"], DAYN=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+const ALARM_SOUNDS=["Classic beeps","Rising","Momo song","My tune"];
+const TRY_SOUNDS=[["pet","Chirp"],["purr","Purr"],["giggle","Giggle"],["laugh","Laugh"],["love","Love"],["kiss","Kiss"],["wake","Wake up"],["goodnight","Good night"],["notify","Message"],["water","Water"],["stretch","Stretch"],["done","Well done"],["new_best","New best"],["alarm_song","Alarm: Momo song"],["alarm_rising","Alarm: rising"],["alarm_classic","Alarm: classic"]];
+let token=localStorage.getItem("momoToken")||"", S=null, INFO=null, timer=null;
+
+function toast(t){const e=$("#toast");e.textContent=t;e.classList.add("show");clearTimeout(e._t);e._t=setTimeout(()=>e.classList.remove("show"),2600)}
+async function api(path,opt={}){
+  opt.headers=Object.assign({"Content-Type":"application/json"},opt.headers||{});
+  if(token)opt.headers["X-Momo-Token"]=token;
+  if(opt.body&&typeof opt.body!=="string")opt.body=JSON.stringify(opt.body);
+  let r;
+  try{r=await fetch(path,opt)}catch(e){$("#conn").textContent="offline";throw new Error("Momo is not reachable")}
+  $("#conn").textContent="";
+  if(r.status===401){token="";localStorage.removeItem("momoToken");show("pair");throw new Error("Please pair this phone")}
+  const j=await r.json().catch(()=>({}));
+  if(!r.ok)throw new Error(j.error||("Error "+r.status));
+  return j;
+}
+const post=(p,b)=>api(p,{method:"POST",body:b||{}});
+function show(id){
+  $$(".page").forEach(p=>p.classList.toggle("on",p.id===id));
+  $$("#nav button").forEach(b=>b.classList.toggle("on",b.dataset.page===id));
+  $("#nav").style.display=id==="pair"?"none":"flex";
+  if(id==="home")refresh();
+  if(id==="more"){loadDevices();loadWeatherAge()}
+}
+$$("#nav button").forEach(b=>b.onclick=()=>show(b.dataset.page));
+
+// ---------- pairing ----------
+$("#pairName").value=localStorage.getItem("momoDevice")||(/Android/.test(navigator.userAgent)?"Android phone":"My phone");
+$("#pairStart").onclick=async()=>{try{await post("/api/pair/start");$("#pairMsg").textContent="Look at Momo's screen and type the 6 numbers.";$("#pairCode").focus()}catch(e){$("#pairMsg").textContent=e.message}};
+$("#pairGo").onclick=async()=>{
+  const code=$("#pairCode").value.replace(/\D/g,""), dev=$("#pairName").value.trim()||"Phone";
+  if(code.length!==6){$("#pairMsg").textContent="The code has 6 numbers.";return}
+  try{const r=await fetch("/api/pair",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({code,device:dev})});
+    const j=await r.json().catch(()=>({}));
+    if(!r.ok){$("#pairMsg").textContent=j.error==="wrong"?`Wrong code. ${j.left} tries left.`:j.error==="expired"?"The code expired. Press 1 again.":j.error==="locked"?"Too many tries. Wait 5 minutes.":"Could not pair.";return}
+    token=j.token;localStorage.setItem("momoToken",token);localStorage.setItem("momoDevice",dev);$("#pairCode").value="";
+    toast("Paired! Hello from Momo");await start();
+  }catch(e){$("#pairMsg").textContent="Momo is not reachable."}
+};
+
+// ---------- home ----------
+function agoText(m){if(m==null)return "";if(m<1)return "just now";if(m<60)return m+" min ago";const h=Math.floor(m/60);return h+" h "+(m%60?(m%60)+" min ":"")+"ago"}
+function weatherAge(w){return w&&w.valid?`${agoText(w.ageMin)} from ${w.fromPhone?"the phone":"the internet"}`:"no weather yet"}
+function showBattery(b){
+  const box=$("#sBatt"),bar=box.querySelector("b"),txt=box.querySelector("span");
+  if(!b||!b.present){bar.style.width="0";txt.textContent="no battery (on USB power)";box.classList.remove("low");return}
+  bar.style.width=Math.round(b.percent*0.26)+"px";
+  box.classList.toggle("low",!b.charging&&b.percent<=15);
+  txt.textContent=b.charging?(b.full?`${b.percent}%, full - you can unplug`:`${b.percent}%, charging`):b.percent<=15?`${b.percent}%, please charge (USB-C)`:`${b.percent}%`;
+}
+async function loadWeatherAge(){try{const s=await api("/api/state");$("#wAge").textContent=weatherAge(s.weather)}catch(e){}}
+async function refresh(){
+  if(!$("#home").classList.contains("on"))return;
+  try{
+    const s=await api("/api/state");
+    $("#title").textContent=s.name;
+    $("#sTime").textContent=s.haveTime?s.time:"--:--";
+    $("#sFace").textContent=s.faceName;
+    $("#sWater").textContent=`${s.drinks}/${s.waterGoal}`;
+    $("#sStretch").textContent=`${s.stretches}/${s.stretchGoal}`;
+    $("#sPets").textContent=s.pets;
+    $("#sAff").style.width=s.affection+"%";
+    $("#sAlarm").textContent=s.nextAlarm||"none";
+    $("#sNote").textContent=s.nextNote||"none";
+    $("#sWeather").textContent=s.weather.valid?`${s.weather.temp}°C ${s.weather.text}, ${s.weather.city} (${s.weather.high}/${s.weather.low}), ${agoText(s.weather.ageMin)}`:"not yet";
+    showBattery(s.battery);
+    $("#sPhone").textContent=s.phone?"connected":"not connected";
+    $("#mTitle").textContent=s.music.known&&s.music.title?s.music.title:"Nothing playing";
+    $("#mArtist").textContent=s.music.known?(s.music.artist||""):"Play a song on your phone";
+    $("#mPlay").innerHTML=s.music.playing?"&#10074;&#10074;":"&#9654;";
+    $("#wifiNow").textContent=s.wifi.connected?`${s.wifi.ssid} (${s.wifi.ip})`:(s.wifi.setup?"setup hotspot":"not connected");
+    const sc=s.scores, best=[sc.jump,sc.flappy,sc.catch,sc.reactionMs?sc.reactionMs+" ms":"-",sc.simon,sc.copy,sc.rhythm,sc.rps];
+    $$("#games button").forEach((b,i)=>b.querySelector("span").textContent="best "+best[i]);
+  }catch(e){}
+}
+$$("[data-act]").forEach(b=>b.onclick=async()=>{try{await post("/api/action",{do:b.dataset.act});toast(b.dataset.msg||"Done");if(b.dataset.act==="weatherNow")setTimeout(refresh,5000)}catch(e){toast(e.message)}});
+$$("[data-music]").forEach(b=>b.onclick=async()=>{try{await post("/api/action",{do:"music",cmd:b.dataset.music});setTimeout(refresh,600)}catch(e){toast(e.message)}});
+
+// ---------- small form helpers ----------
+function daysEl(mask,onChange){
+  const d=document.createElement("div");d.className="days";
+  DAYS.forEach((n,i)=>{const b=document.createElement("button");b.type="button";b.textContent=n;b.title=DAYN[i];b.setAttribute("aria-label",DAYN[i]);
+    const set=()=>b.classList.toggle("on",!!(mask&(1<<i)));set();
+    b.onclick=()=>{mask^=(1<<i);set();onChange(mask)};d.appendChild(b)});
+  return d;
+}
+function seg(el,val,onChange){$$("#"+el+" button").forEach(b=>{b.classList.toggle("on",+b.dataset.v===val);b.onclick=()=>{$$("#"+el+" button").forEach(x=>x.classList.remove("on"));b.classList.add("on");onChange(+b.dataset.v)}})}
+const pad=n=>String(n).padStart(2,"0");
+
+// ---------- alarms ----------
+function renderAlarms(){
+  const box=$("#alarmList");box.innerHTML="";
+  S.alarms.forEach((a,i)=>{
+    const d=document.createElement("div");d.className="alarm";
+    d.innerHTML=`<div class="row"><input type="checkbox" aria-label="Alarm ${i+1} on" ${a.on?"checked":""}><input type="time" value="${a.time}"><input placeholder="Label" maxlength="15" style="flex:1;min-width:120px"></div>
+      <div class="row days-slot"></div>
+      <div class="row"><select style="flex:1;min-width:120px" aria-label="Alarm sound">${ALARM_SOUNDS.map((n,k)=>`<option value="${k}" ${k===a.sound?"selected":""}>${n}</option>`).join("")}</select>
+      <span class="muted" style="flex:none">Snooze</span><input type="number" min="1" max="30" value="${a.snooze}" style="width:64px" aria-label="Snooze minutes"><span class="muted" style="flex:none">min</span><button type="button" class="test">Test</button></div>
+      <p class="muted">${a.days?"Repeats on the days that are lit":"No days lit = rings once"}</p>`;
+    const [on,time,label]=d.querySelectorAll("input");label.value=a.label;
+    on.onchange=()=>a.on=on.checked;time.onchange=()=>a.time=time.value||a.time;label.oninput=()=>a.label=label.value;
+    d.querySelector("select").onchange=e=>a.sound=+e.target.value;
+    d.querySelector("input[type=number]").onchange=e=>a.snooze=Math.min(30,Math.max(1,+e.target.value||5));
+    d.querySelector(".days-slot").appendChild(daysEl(a.days,m=>{a.days=m;d.querySelector("p").textContent=m?"Repeats on the days that are lit":"No days lit = rings once"}));
+    d.querySelector(".test").onclick=async()=>{try{await post("/api/action",{do:"alarm",index:i});toast("Ringing on Momo - tap Momo to snooze, hold to stop")}catch(e){toast(e.message)}};
+    box.appendChild(d);
+  });
+}
+
+// ---------- reminders ----------
+function renderReminder(key,boxId,title,unit){
+  const r=S[key], box=$(boxId);
+  box.innerHTML=`<div class="card"><h2>${title}</h2>
+    <div class="row"><label>Reminders on</label><input type="checkbox" class="on"></div>
+    <div class="row days-slot"></div>
+    <p class="muted">At these exact times (up to 8):</p>
+    <div class="times"></div>
+    <div class="row"><input type="time" class="newt"><button type="button" class="add">Add time</button></div>
+    <div class="row"><label>Also every (minutes)</label><input type="checkbox" class="every"><input type="number" class="evm" min="10" max="600" style="width:80px"></div>
+    <div class="row"><label>between</label><input type="time" class="from"><label style="flex:none;min-width:0">and</label><input type="time" class="to"></div>
+    <div class="row"><label>Daily goal (${unit})</label><input type="number" class="goal" min="1" max="30" style="width:80px"></div></div>`;
+  const q=s=>box.querySelector(s);
+  q(".on").checked=r.on;q(".on").onchange=e=>r.on=e.target.checked;
+  q(".days-slot").appendChild(daysEl(r.days,m=>r.days=m));
+  const drawTimes=()=>{const t=q(".times");t.innerHTML="";r.times.sort();
+    if(!r.times.length)t.innerHTML='<span class="muted">No exact times</span>';
+    r.times.forEach((v,k)=>{const c=document.createElement("span");c.className="chip";c.innerHTML=`${v}<button type="button" aria-label="Remove ${v}">&#10005;</button>`;c.querySelector("button").onclick=()=>{r.times.splice(k,1);drawTimes()};t.appendChild(c)})};
+  drawTimes();
+  q(".add").onclick=()=>{const v=q(".newt").value;if(!v)return toast("Pick a time first");if(r.times.length>=8)return toast("Up to 8 times");if(!r.times.includes(v))r.times.push(v);drawTimes()};
+  q(".every").checked=r.every;q(".every").onchange=e=>r.every=e.target.checked;
+  q(".evm").value=r.everyMin;q(".evm").onchange=e=>r.everyMin=Math.min(600,Math.max(10,+e.target.value||45));
+  q(".from").value=r.from;q(".from").onchange=e=>r.from=e.target.value||r.from;
+  q(".to").value=r.to;q(".to").onchange=e=>r.to=e.target.value||r.to;
+  q(".goal").value=r.goal;q(".goal").onchange=e=>r.goal=Math.min(30,Math.max(1,+e.target.value||1));
+}
+
+// ---------- sounds ----------
+function renderSounds(){
+  const s=S.sound;
+  $("#sndTheme").value=s.theme;$("#sndTheme").onchange=e=>{s.theme=+e.target.value;$("#xTheme").value=s.theme};
+  seg("sndVol",s.volume,v=>s.volume=v);
+  [["sndPets","pets"],["sndRem","reminders"],["sndNot","notify"],["sndGames","games"],["sndChime","chime"]].forEach(([id,k])=>{$("#"+id).checked=s[k];$("#"+id).onchange=e=>s[k]=e.target.checked});
+  $("#qOn").checked=S.quiet.on;$("#qOn").onchange=e=>S.quiet.on=e.target.checked;
+  $("#qFrom").value=S.quiet.from;$("#qFrom").onchange=e=>S.quiet.from=e.target.value||S.quiet.from;
+  $("#qTo").value=S.quiet.to;$("#qTo").onchange=e=>S.quiet.to=e.target.value||S.quiet.to;
+  $("#tune").value=s.tune;$("#tune").oninput=e=>s.tune=e.target.value;
+}
+$("#tuneTry").onclick=async()=>{try{await post("/api/action",{do:"tune",notes:$("#tune").value});toast("Playing on Momo")}catch(e){toast("Momo could not read that tune")}};
+
+// ---------- behaviour / weather ----------
+const SRC_HELP=["Auto: from the Chronos app while your phone is connected, otherwise from the internet over Momo's Wi-Fi.",
+  "Phone: only from the Chronos app on your phone (Bluetooth, no Wi-Fi needed). The phone decides when it sends new weather.",
+  "Internet: Momo gets it from open-meteo.com over Wi-Fi for the city above."];
+function renderLook(){
+  seg("xLook",S.look,v=>S.look=v);
+  $("#xTheme").value=S.sound.theme;$("#xTheme").onchange=e=>{S.sound.theme=+e.target.value;$("#sndTheme").value=S.sound.theme};
+  $("#xRub").checked=S.rub;$("#xRub").onchange=e=>S.rub=e.target.checked;
+  $("#xLowBatt").checked=S.lowBattAlert;$("#xLowBatt").onchange=e=>S.lowBattAlert=e.target.checked;
+}
+function renderMore(){
+  renderLook();
+  $("#bName").value=S.name;$("#bName").oninput=e=>S.name=e.target.value;
+  $("#bWake").value=S.wake;$("#bWake").onchange=e=>S.wake=e.target.value||S.wake;
+  $("#bSleep").value=S.sleep;$("#bSleep").onchange=e=>S.sleep=e.target.value||S.sleep;
+  $("#b24").checked=S.clock24;$("#b24").onchange=e=>S.clock24=e.target.checked;
+  const p=S.play;
+  seg("bLively",p.lively,v=>p.lively=v);
+  const num=(id,k,lo,hi)=>{$("#"+id).value=p[k];$("#"+id).onchange=e=>p[k]=Math.min(hi,Math.max(lo,+e.target.value||lo))};
+  num("bBored","boredMin",1,60);num("bNap","napMin",2,120);num("bGap","gap",5,240);num("bFocus","focusMin",5,120);num("bBreak","breakMin",1,60);
+  $("#bSelf").checked=p.self;$("#bSelf").onchange=e=>p.self=e.target.checked;
+  $("#bPlayFrom").value=p.from;$("#bPlayFrom").onchange=e=>p.from=e.target.value||p.from;
+  $("#bPlayTo").value=p.to;$("#bPlayTo").onchange=e=>p.to=e.target.value||p.to;
+  $("#bTilt").checked=p.tiltFlip;$("#bTilt").onchange=e=>p.tiltFlip=e.target.checked;
+  $("#bHugs").checked=S.hugs;$("#bHugs").onchange=e=>S.hugs=e.target.checked;
+  $("#bIss").checked=S.iss;$("#bIss").onchange=e=>S.iss=e.target.checked;
+  const w=S.weather;
+  $("#wOn").checked=w.on;$("#wOn").onchange=e=>w.on=e.target.checked;
+  $("#wCity").value=w.city;$("#wCity").oninput=e=>w.city=e.target.value;
+  $("#wLat").value=(+w.lat).toFixed(3);$("#wLat").onchange=e=>w.lat=+e.target.value;
+  $("#wLon").value=(+w.lon).toFixed(3);$("#wLon").onchange=e=>w.lon=+e.target.value;
+  $("#wEvery").value=w.every;if($("#wEvery").value!==String(w.every)){const o=document.createElement("option");o.value=w.every;o.textContent=w.every+" minutes";$("#wEvery").appendChild(o);$("#wEvery").value=w.every}
+  $("#wEvery").onchange=e=>w.every=+e.target.value;
+  const srcHelp=()=>$("#wSourceHelp").textContent=SRC_HELP[w.source]+(INFO.wokwi&&w.source!==2?" (The simulator has no phone, so choose Internet there.)":"");
+  seg("wSource",w.source,v=>{w.source=v;srcHelp()});srcHelp();
+  const tz=$("#tz");tz.innerHTML="";
+  for(let m=-720;m<=840;m+=15){if(m%60&&![-570,-210,210,270,330,345,390,525,570,630,765,825].includes(m))continue;
+    const o=document.createElement("option");o.value=m;const h=Math.floor(Math.abs(m)/60),mm=Math.abs(m)%60;o.textContent=`UTC${m<0?"-":"+"}${h}:${pad(mm)}`;tz.appendChild(o)}
+  tz.value=S.utcOffsetMin;tz.onchange=e=>S.utcOffsetMin=+e.target.value;
+  $("#wifiSsid").value=S.wifiSaved?S.wifiSsid:"";
+  $("#ver").textContent=`${INFO.name} version ${INFO.version}${INFO.wokwi?" (Wokwi simulator)":""}`;
+}
+$("#wNow").onclick=async()=>{
+  if(S.weather.source===1)return toast("Phone weather comes from the Chronos app. Open it on your phone to send new weather.");
+  try{await post("/api/action",{do:"weatherNow"});$("#wAge").textContent="updating...";toast("Momo is getting the weather");setTimeout(loadWeatherAge,5000)}catch(e){toast(e.message)}
+};
+$("#wFind").onclick=async()=>{
+  const n=$("#wSearch").value.trim();if(!n)return;
+  const ul=$("#wResults");ul.innerHTML='<li class="muted">Searching...</li>';
+  try{const r=await fetch("https://geocoding-api.open-meteo.com/v1/search?count=5&name="+encodeURIComponent(n));const j=await r.json();ul.innerHTML="";
+    (j.results||[]).forEach(c=>{const li=document.createElement("li");li.innerHTML=`<span>${c.name}, ${c.admin1||""} ${c.country||""}</span><button type="button">Use</button>`;
+      li.querySelector("button").onclick=()=>{S.weather.city=c.name.slice(0,23);S.weather.lat=+c.latitude.toFixed(3);S.weather.lon=+c.longitude.toFixed(3);renderMore();ul.innerHTML="";toast("Now press Save")};ul.appendChild(li)});
+    if(!ul.children.length)ul.innerHTML='<li class="muted">No city found</li>';
+  }catch(e){ul.innerHTML='<li class="muted">Search needs internet on this phone. You can type latitude and longitude instead.</li>'}
+};
+
+// ---------- saving ----------
+const SAVE={
+  alarms:()=>({alarms:S.alarms}),
+  notes:()=>({notes:S.notes}),
+  reminders:()=>({water:S.water,stretch:S.stretch}),
+  sounds:()=>({sound:S.sound,quiet:S.quiet}),
+  look:()=>({look:S.look,rub:S.rub,lowBattAlert:S.lowBattAlert,sound:{theme:S.sound.theme}}),
+  behaviour:()=>({name:S.name,wake:S.wake,sleep:S.sleep,clock24:S.clock24,play:S.play,hugs:S.hugs,iss:S.iss}),
+  weather:()=>({weather:S.weather,utcOffsetMin:S.utcOffsetMin})
+};
+$$("[data-save]").forEach(b=>b.onclick=async()=>{
+  b.disabled=true;
+  try{S=await post("/api/settings",SAVE[b.dataset.save]());renderAll();toast("Saved on Momo")}catch(e){toast(e.message)}
+  b.disabled=false;
+});
+
+// ---------- Wi-Fi ----------
+$("#wifiScan").onclick=async()=>{
+  const ul=$("#wifiList");ul.innerHTML='<li class="muted">Looking for networks...</li>';
+  try{const j=await api("/api/wifi/scan");ul.innerHTML="";
+    j.networks.sort((a,b)=>b.rssi-a.rssi).forEach(n=>{const li=document.createElement("li");const bars=n.rssi>-55?"▂▄▆":n.rssi>-70?"▂▄":"▂";
+      li.innerHTML=`<span></span><small class="muted">${bars}${n.open?"":" 🔒"}</small><button type="button">Choose</button>`;li.querySelector("span").textContent=n.ssid;
+      li.querySelector("button").onclick=()=>{$("#wifiSsid").value=n.ssid;$("#wifiPass").focus()};ul.appendChild(li)});
+    if(!ul.children.length)ul.innerHTML='<li class="muted">No networks found</li>';
+  }catch(e){ul.innerHTML=`<li class="muted">${e.message}</li>`}
+};
+$("#wifiSave").onclick=async()=>{
+  const ssid=$("#wifiSsid").value.trim(), pass=$("#wifiPass").value;
+  if(!ssid)return toast("Type or choose a network");
+  const msg=$("#wifiMsg");
+  try{await post("/api/wifi",pass?{ssid,pass}:{ssid});$("#wifiPass").value="";
+    msg.textContent=`Momo is joining ${ssid}...`;
+    for(let i=0;i<15;i++){await new Promise(r=>setTimeout(r,2000));
+      try{const s=await api("/api/state");if(s.wifi.connected&&s.wifi.ssid===ssid){
+        msg.textContent=`Momo is on ${ssid}. Its address: http://${s.wifi.ip} (or http://momo.local). Connect this phone to ${ssid}, open that address and pair once more.`;return}}catch(e){}}
+    msg.textContent=`Momo could not confirm ${ssid} yet. Check the password, or look at Momo's screen for its address.`;}
+  catch(e){msg.textContent=e.message}
+};
+
+// ---------- security & backup ----------
+async function loadDevices(){
+  try{const j=await api("/api/devices");const ul=$("#devices");ul.innerHTML="";
+    j.devices.forEach(d=>{const li=document.createElement("li");li.innerHTML=`<span></span><button type="button" class="warn">Unpair</button>`;li.querySelector("span").textContent=d.device+(d.you?" (this phone)":"");
+      li.querySelector("button").onclick=async()=>{if(!confirm("Unpair "+d.device+"?"))return;await post("/api/unpair",{slot:d.slot});if(d.you){token="";localStorage.removeItem("momoToken");show("pair")}else loadDevices()};ul.appendChild(li)});
+  }catch(e){}
+}
+$("#unpairAll").onclick=async()=>{if(!confirm("Unpair every phone? You will need Momo's code to pair again."))return;try{await post("/api/unpair",{all:true})}catch(e){}token="";localStorage.removeItem("momoToken");show("pair")};
+$("#resetScores").onclick=async()=>{if(!confirm("Reset all best scores?"))return;try{await post("/api/action",{do:"scoresReset"});toast("Scores reset")}catch(e){toast(e.message)}};
+$("#backup").onclick=async()=>{
+  try{const j=await api("/api/backup");const blob=new Blob([JSON.stringify(j,null,2)],{type:"application/json"});
+    const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=`momo-backup-${new Date().toISOString().slice(0,10)}.json`;document.body.appendChild(a);a.click();a.remove();toast("Backup saved to this phone")}
+  catch(e){toast(e.message)}
+};
+$("#restoreFile").onchange=async e=>{
+  const f=e.target.files[0];if(!f)return;
+  try{const j=JSON.parse(await f.text());if(j.type!=="momo-backup")throw new Error("This is not a Momo backup");
+    await post("/api/restore",j);S=await api("/api/settings");renderAll();toast("Backup restored")}
+  catch(err){toast(err.message||"Could not read the file")}
+  e.target.value="";
+};
+
+// ---------- start ----------
+// ---------- my reminders ----------
+function todayStr(){const d=new Date();return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`}
+function renderNotes(){
+  if(!S.notes)S.notes=[];
+  const box=$("#noteList");box.innerHTML="";
+  if(!S.notes.length)box.innerHTML='<p class="muted">No reminders yet.</p>';
+  S.notes.forEach((n,i)=>{
+    const d=document.createElement("div");d.className="alarm";
+    const rep=n.days===0?"once":n.days===127?"daily":"days";
+    d.innerHTML=`<div class="row"><input type="checkbox" aria-label="Reminder ${i+1} on" ${n.on?"checked":""}><input class="ntext" placeholder="What to remember" maxlength="31" style="flex:1;min-width:150px"></div>
+      <div class="row"><input type="time" value="${n.time}" aria-label="Time"><select aria-label="Repeat"><option value="once">Once</option><option value="daily">Every day</option><option value="days">Some days</option></select>
+      <input type="date" value="${n.date||todayStr()}" aria-label="Date"></div>
+      <div class="row days-slot"></div>
+      <div class="row"><button type="button" class="test">Test on Momo</button><button type="button" class="warn del">Delete</button></div>`;
+    const [on,text]=d.querySelectorAll("input");text.value=n.text;
+    on.onchange=()=>n.on=on.checked;text.oninput=()=>n.text=text.value;
+    d.querySelector("input[type=time]").onchange=e=>n.time=e.target.value||n.time;
+    const sel=d.querySelector("select"),date=d.querySelector("input[type=date]"),slot=d.querySelector(".days-slot");
+    sel.value=rep;
+    const show=()=>{date.style.display=sel.value==="once"?"":"none";slot.style.display=sel.value==="days"?"":"none"};
+    sel.onchange=()=>{n.days=sel.value==="once"?0:sel.value==="daily"?127:(n.days&&n.days!==127?n.days:62);slot.innerHTML="";slot.appendChild(daysEl(n.days,m=>n.days=m||62));show()};
+    date.onchange=e=>n.date=e.target.value||n.date;
+    slot.appendChild(daysEl(n.days,m=>n.days=m||62));show();
+    d.querySelector(".del").onclick=()=>{S.notes.splice(i,1);renderNotes();toast("Removed - press Save")};
+    d.querySelector(".test").onclick=async()=>{try{await post("/api/action",{do:"note",index:i});toast("Showing on Momo - tap Momo to close")}catch(e){toast("Save first, then test")}};
+    box.appendChild(d);
+  });
+  $("#noteAdd").disabled=S.notes.length>=10;
+}
+$("#noteAdd").onclick=()=>{
+  if(S.notes.length>=10)return toast("Up to 10 reminders");
+  const t=new Date(Date.now()+10*60000);
+  S.notes.push({on:true,text:"",time:`${pad(t.getHours())}:${pad(t.getMinutes())}`,days:0,date:todayStr()});
+  renderNotes();const all=$$("#noteList .ntext");if(all.length)all[all.length-1].focus();
+};
+
+function renderAll(){renderNotes();renderAlarms();renderReminder("water","#remWater","Water","glasses");renderReminder("stretch","#remStretch","Stretch breaks","stretches");renderSounds();renderMore()}
+async function start(){
+  try{INFO=await api("/api/info")}catch(e){$("#conn").textContent="offline";setTimeout(start,3000);return}
+  $("#title").textContent=INFO.name;
+  if(!token||!INFO.you){show("pair");return}
+  const fb=$("#faces");fb.innerHTML="";
+  INFO.faces.forEach((n,i)=>{const b=document.createElement("button");b.textContent=n;b.onclick=async()=>{try{await post("/api/action",{do:"face",id:i})}catch(e){toast(e.message)}};fb.appendChild(b)});
+  const gb=$("#games");gb.innerHTML="";
+  INFO.games.forEach((n,i)=>{const b=document.createElement("button");b.innerHTML=`${n}<br><span class="muted"></span>`;b.onclick=async()=>{try{await post("/api/action",{do:"game",id:i});toast("Game started on Momo")}catch(e){toast(e.message)}};gb.appendChild(b)});
+  const tb=$("#sndTry");tb.innerHTML="";
+  TRY_SOUNDS.forEach(([k,n])=>{const b=document.createElement("button");b.textContent=n;b.onclick=async()=>{try{await post("/api/action",{do:"sound",name:k})}catch(e){toast(e.message)}};tb.appendChild(b)});
+  try{S=await api("/api/settings")}catch(e){return}
+  renderAll();show("home");
+  clearInterval(timer);timer=setInterval(()=>{if(!document.hidden)refresh()},5000);
+}
+start();
+</script>
+</body>
+</html>

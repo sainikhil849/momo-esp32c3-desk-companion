@@ -1,0 +1,200 @@
+{
+  "version": 1,
+  "author": "Momo desk robot",
+  "editor": "wokwi",
+  "parts": [
+    {
+      "type": "board-esp32-c3-devkitm-1",
+      "id": "esp",
+      "top": 0,
+      "left": 0,
+      "attrs": {
+        "firmwareOffset": "0",
+        "flashSize": "4"
+      }
+    },
+    {
+      "type": "board-ssd1306",
+      "id": "oled1",
+      "top": -150,
+      "left": 140,
+      "attrs": {
+        "i2cAddress": "0x3c"
+      }
+    },
+    {
+      "type": "wokwi-ds1307",
+      "id": "rtc1",
+      "top": -140,
+      "left": -230,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-mpu6050",
+      "id": "imu1",
+      "top": 40,
+      "left": 260,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-pushbutton",
+      "id": "btn1",
+      "top": 150,
+      "left": -210,
+      "attrs": {
+        "color": "blue",
+        "label": "Touch (T key)",
+        "bounce": "0",
+        "key": "t"
+      }
+    },
+    {
+      "type": "wokwi-buzzer",
+      "id": "bz1",
+      "top": 200,
+      "left": 150,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-pushbutton",
+      "id": "btn2",
+      "top": 250,
+      "left": -210,
+      "attrs": {
+        "color": "red",
+        "label": "Back button (B key)",
+        "bounce": "0",
+        "key": "b"
+      }
+    }
+  ],
+  "connections": [
+    [
+      "esp:TX",
+      "$serialMonitor:RX",
+      "",
+      []
+    ],
+    [
+      "esp:RX",
+      "$serialMonitor:TX",
+      "",
+      []
+    ],
+    [
+      "oled1:GND",
+      "esp:GND.10",
+      "black",
+      []
+    ],
+    [
+      "oled1:VCC",
+      "esp:3V3.1",
+      "red",
+      []
+    ],
+    [
+      "oled1:SCL",
+      "esp:9",
+      "gold",
+      []
+    ],
+    [
+      "oled1:SDA",
+      "esp:8",
+      "green",
+      []
+    ],
+    [
+      "rtc1:GND",
+      "esp:GND.1",
+      "black",
+      []
+    ],
+    [
+      "rtc1:5V",
+      "esp:3V3.1",
+      "red",
+      []
+    ],
+    [
+      "rtc1:SCL",
+      "esp:9",
+      "gold",
+      []
+    ],
+    [
+      "rtc1:SDA",
+      "esp:8",
+      "green",
+      []
+    ],
+    [
+      "imu1:GND",
+      "esp:GND.9",
+      "black",
+      []
+    ],
+    [
+      "imu1:VCC",
+      "esp:3V3.2",
+      "red",
+      []
+    ],
+    [
+      "imu1:SCL",
+      "esp:9",
+      "gold",
+      []
+    ],
+    [
+      "imu1:SDA",
+      "esp:8",
+      "green",
+      []
+    ],
+    [
+      "imu1:AD0",
+      "esp:3V3.2",
+      "red",
+      []
+    ],
+    [
+      "btn1:1.r",
+      "esp:3V3.2",
+      "red",
+      []
+    ],
+    [
+      "btn1:2.r",
+      "esp:3",
+      "blue",
+      []
+    ],
+    [
+      "bz1:1",
+      "esp:GND.7",
+      "black",
+      []
+    ],
+    [
+      "bz1:2",
+      "esp:10",
+      "purple",
+      []
+    ],
+    [
+      "btn2:1.r",
+      "esp:5",
+      "red",
+      []
+    ],
+    [
+      "btn2:2.r",
+      "esp:GND.8",
+      "black",
+      []
+    ]
+  ],
+  "dependencies": {}
+}

@@ -1,0 +1,9 @@
+{
+  // VS Code is only used to RUN the Wokwi simulator for this folder.
+  // The code is compiled and checked by Arduino IDE, so VS Code's own
+  // C/C++ checker (IntelliSense) is switched off here. It cannot find
+  // the Arduino/ESP32 library files and shows false "#include" errors.
+  "C_Cpp.intelliSenseEngine": "disabled",
+  "C_Cpp.errorSquiggles": "disabled",
+  "files.associations": { "*.ino": "cpp" }
+}

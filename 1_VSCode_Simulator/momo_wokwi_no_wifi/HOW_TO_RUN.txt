@@ -1,0 +1,26 @@
+MOMO 2.2 SIMULATOR - WITHOUT WI-FI (backup version)
+===================================================
+
+Use this folder ONLY if the normal simulator (folder momo_wokwi) stops at
+"[Momo] starting Wi-Fi" or at "[Momo] reading the battery" on your PC.
+
+Everything works the same - hero faces and sounds, menu, games, alarms,
+reminders, water and stretch, back button, head rub, sleep, music test,
+weather test (animated), night and morning - except the Momo app, internet
+time and internet weather (they need Wi-Fi) and the battery (this backup has
+no battery knob and no charger switch: Momo runs "on USB" and hides the
+battery icon).
+
+Run it exactly like the normal one:
+  VS Code > File > Open Folder > select momo_wokwi_no_wifi > Select Folder,
+  click diagram.json, F1 > Wokwi: Start Simulator.
+
+The parts in the circuit:
+  Blue button (T key) = touch sensor on the head
+  Red button  (B key) = back button
+
+Click = pet / next, hold 1 s and let go = menu / choose, double-click =
+back, keep holding the blue button = head rub, hold the red button 3 s =
+sleep (press it again to wake Momo). Full details: momo_wokwi/HOW_TO_RUN.txt
+
+The clock comes from the simulated clock module (shown in India time).

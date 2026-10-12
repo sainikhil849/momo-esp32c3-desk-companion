@@ -1,0 +1,74 @@
+MOMO 2.2 - PUT IT ON THE ROBOT (Arduino IDE, Windows)
+=====================================================
+
+Momo 2.2 adds a battery with USB-C charging, a power switch and a back
+button (all optional: without them Momo works exactly as 2.1 and simply
+hides the battery icon). Full shopping list with prices, wiring diagram and
+soldering steps: HARDWARE_GUIDE.md in the main folder.
+
+  Part                 Pin on the ESP32-C3 Super Mini
+  -------------------  ------------------------------------------------
+  OLED 1.3" (SH1106)   SDA -> GPIO 8, SCL -> GPIO 9, VCC -> 3.3V, GND
+  DS3231 clock         SDA -> GPIO 8, SCL -> GPIO 9, VCC -> 3.3V, GND
+  MPU6050              SDA -> GPIO 8, SCL -> GPIO 9, VCC -> 3.3V, GND,
+                       AD0 -> 3.3V (address 0x69)
+  TTP223 touch         OUT -> GPIO 3, VCC -> 3.3V, GND
+  Passive buzzer       GPIO 10 -> 1k resistor -> NPN base (S8050/2N2222/BC547)
+                       emitter -> GND, collector -> buzzer -, buzzer + -> 3.3V,
+                       1N4148 diode across the buzzer (stripe on +)
+                       (straight to GPIO 10 also works, but it is quiet)
+  Back button (new)    GPIO 5 -> button -> GND, and 10k from GPIO 5 to 3.3V
+  Battery level (new)  battery + (TP4056 B+) -> 100k -> GPIO 4 -> 100k -> GND
+  Charger plugged (new) TP4056 IN+ -> 100k -> GPIO 7 -> 150k -> GND
+  Power (new)          TP4056 OUT+ -> 1N5819 -+
+                       TP4056 IN+  -> 1N5819 -+-> slide switch -> 5V pin
+                       TP4056 OUT- -> GND   (diode stripes towards the switch)
+
+1. ESP32 boards (once)
+   Tools > Board > Boards Manager > "esp32 by Espressif Systems",
+   version 3.1.1 or newer (tested on 3.1.1 and 3.3.12).
+
+2. Libraries (once) - Sketch > Include Library > Manage Libraries:
+     Adafruit GFX Library
+     Adafruit SH110X
+     Adafruit BusIO
+     ArduinoJson            (by Benoit Blanchon, version 7)      <- new
+     ChronosESP32           (by fbiego) > "Install All" (it also adds
+                            NimBLE-Arduino and ESP32Time)
+
+3. Open momo/momo.ino (keep all 10 .h files in the same momo folder).
+   Check line 61:  #define WOKWI 0
+
+4. Tools menu
+     Board            : ESP32C3 Dev Module
+     USB CDC On Boot  : Enabled
+     Partition Scheme : Huge APP (3MB No OTA/1MB SPIFFS)      <- needed now
+     Flash Mode       : DIO
+     Port             : the COM port of your board
+   Plug the cable into the CODE socket (the ESP32's own USB-C), not CHARGE.
+
+5. Upload. Open Serial Monitor at 115200. You should see:
+     Hello! I am Momo. (version 2.2)
+     Screen: OK | Clock module: OK | Motion sensor: OK
+     Momo 2.2: hero look and sounds are on (change them in the app)
+     Battery: 84% (4050 mV)          (only if a battery is connected)
+     Bluetooth: ready - connect from the Chronos app
+     Wi-Fi setup hotspot: Momo-XXXX (password on Momo's screen)
+
+6. Now connect your phone: PHONE_SETUP.txt
+
+If something looks wrong
+  Screen shifted / noisy line at one edge : set SCREEN_IS_SSD1306 to 1 and
+                                            install "Adafruit SSD1306".
+  Face upside down                        : FLIP_SCREEN = true
+  Screen blank                            : OLED_ADDR = 0x3D
+  "Sketch too big"                        : Partition Scheme = Huge APP
+  Restarts in a loop after upload         : Flash Mode = DIO
+  Clock module: NOT FOUND / Motion: NOT FOUND : check SDA/SCL and 3.3V wires
+  Back button / sleep / battery problems      : HARDWARE_GUIDE.md, section 8
+
+Going from Momo 2.0 or 2.1 to 2.2 keeps everything (settings, alarms,
+reminders, paired phones, pets, scores, Wi-Fi). On its first start 2.2
+switches to the hero look and hero sounds - App > More > Momo's look goes
+back to Classic. Same libraries, same Tools settings.
+(From Momo 1, Momo 2 starts fresh - pets and scores are not carried over.)

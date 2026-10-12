@@ -1,0 +1,114 @@
+MOMO 2.2 - READY-TO-RUN SIMULATOR FOR VS CODE (Wokwi)
+=====================================================
+
+The firmware is ALREADY BUILT and tested (build folder). You do not need
+Arduino IDE to run it. Same steps as before.
+
+RUN IT
+  1. Unzip. VS Code > File > Open Folder > select THIS folder (momo_wokwi,
+     the one with wokwi.toml in it) > Select Folder. "Trust the authors?" > Yes.
+  2. Click diagram.json once (the circuit opens).
+  3. F1 > type: Wokwi: Start Simulator > Enter.
+
+WHAT YOU SHOULD SEE (terminal at the bottom)
+     [Momo] program started
+     Hello! I am Momo. (version 2.2)
+     Screen: OK | Clock module: OK | Motion sensor: OK
+     Momo 2.2: hero look and sounds are on (change them in the app)
+     Battery: 8x% (40xx mV)          <- the knob is the battery
+     [Momo] reading the battery
+     [Momo] setup finished - Momo is running
+     Wi-Fi connected. Momo app: http://10.x.x.x
+     Time from the internet: ...
+     Weather from the internet: ok
+  The screen shows a growing hero star with "Momo v2.2", then the eyes
+  with a little hero mask.
+
+THE PARTS IN THE CIRCUIT (what each one is on the real robot)
+  Blue button  (T key)  = the touch sensor on Momo's head (TTP223, pin 3)
+  Red button   (B key)  = the back button on Momo's back (pin 5)
+  Knob                  = the battery (pin 4). Turn right = full (4.2 V),
+                          near the left = empty (3.3 V), all the way left =
+                          no battery fitted (the battery icon disappears).
+  Slide switch          = USB-C charger cable (pin 7). Slide it to the
+                          RIGHT = cable plugged in (Momo shows "Charging"),
+                          LEFT = unplugged.
+  The real robot's power slide switch is not in the simulator (it just
+  cuts the power).
+
+HOW TO TALK TO MOMO (blue and red buttons do the same things)
+  Click                    : pet Momo / next menu item / play
+  Hold 1 second, let go    : open the menu (on the face) / choose
+  Double-click             : BACK (out of a game, up one menu, close a screen)
+                             In Jump and Flappy: hold = back to the games.
+  Keep holding the BLUE    : head rub - Momo closes its eyes and purrs
+  button (2 s or more)       (let go after 1-1.5 s instead = menu)
+  Hold the RED button 3 s  : Momo says good night and sleeps (screen off).
+                             Press the red button again = Momo wakes up.
+  Tilt (music, Catch game): click the MPU6050 while running, move accelX to
+     +0.7 (tilt right) or -0.7 (tilt left), then back to 0.
+  Shake: set accelX to 2, then back to 0 = Momo gets dizzy.
+
+NEW IN 2.2 - TRY THESE
+  - Slide the switch right: charging screen and a power-up sound. Turn the
+    knob fully right: "Full!". Slide it left again.
+  - Turn the knob slowly left (switch on the left): at about 15% Momo says
+    "Battery low - please charge me with the USB-C cable." Turn it almost
+    (not fully) to the left and wait about 15 s: Momo goes to sleep by
+    itself ("Battery empty"). Turn the knob right and press the red button.
+  - Menu > I drank water: mini hero Momo flies in with a cape, drinks and
+    powers up. Menu > Stretch now: a hero workout (hips, punches, jump).
+  - Menu > Weather (or Test > weather): the weather is animated - sun rays,
+    moving clouds, rain, storm flashes, snow, fog, wind.
+  - Menu > 46 expressions: every face has its own hero sound.
+  - App > More > Momo's look: switch between Mini hero and Classic.
+
+THE MOMO APP ON YOUR PC
+  While the simulator runs, open Chrome on your PC: http://localhost:8180
+     1. Press "1. Show a code on Momo" - a 6-digit code appears on the
+        simulated screen.
+     2. Type it, press "2. Pair".
+  New in 2.2: battery on Home, Back and Update weather buttons, the
+  "Talk to Momo" help card, More > Momo's look (Mini hero / Classic, hero
+  sounds, head rub, low-battery warning), More > Weather: get the weather
+  every 10 minutes ... 3 hours, from Auto / Phone / Internet, Update now.
+  (The simulator has no phone, so use Auto or Internet there.)
+  Tip: press F12 in Chrome, then the phone icon, to see it like a phone.
+
+THINGS TO TRY IN THE MENU
+  46 expressions, Games > (Jump, Flappy, Catch, Reaction, Simon, Copy me,
+  Rhythm, Rock paper - best scores are saved), Focus timer, I drank water,
+  Stretch now, Weather, Clock, Phone & Wi-Fi > App address,
+  Test > message, call, music, weather, alarm, water, stretch, hug,
+  space, morning, good night.
+
+SHORT TIMES IN THE SIMULATOR (so you do not wait long)
+  bored after 20 s alone, plays Pong ~6 s later (only between 10:00 and
+  20:00), naps after 90 s, alarm snooze 20 s, reminder "later" 30 s,
+  focus 1 minute + break 30 s. The real robot uses the times from the app.
+
+TROUBLESHOOTING
+  "wokwi.toml not found"      You opened the wrong folder. Open momo_wokwi.
+  Restarts again and again    Only if you rebuilt it: Flash Mode must be DIO.
+  App does not open at        Wait for the "Wi-Fi connected" line first, then
+  localhost:8180              reload. Keep the simulator running.
+  Time is wrong at the start  It is corrected from the internet a few seconds
+                              after "Wi-Fi connected".
+  Always "Charging"           The slide switch is on the right. Slide it left.
+  No battery icon             The knob is all the way left. Turn it right.
+  Screen stays black          Momo is asleep. Press the red button (B key).
+  Stops at "[Momo] starting   Open the folder momo_wokwi_no_wifi instead: the
+  Wi-Fi" or at "[Momo]        same Momo without Wi-Fi and without the battery
+  reading the battery"        knob (everything except the app, internet time,
+                              internet weather and the battery screens).
+
+ONLY IF YOU CHANGE THE CODE
+  Arduino IDE > open momo_wokwi.ino (all .h files stay in the same folder).
+  Tools:  Board            : ESP32C3 Dev Module
+          USB CDC On Boot  : Disabled
+          Partition Scheme : Huge APP (3MB No OTA/1MB SPIFFS)
+          Flash Mode       : DIO      <- QIO makes it restart in a loop
+  Libraries: Adafruit SSD1306, Adafruit GFX Library, Adafruit BusIO,
+             ArduinoJson (by Benoit Blanchon).
+  Sketch > Export Compiled Binary. It replaces the files in the build
+  folder; start the simulator again.
